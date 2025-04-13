@@ -1,0 +1,2409 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PHYSICS LOCKEN IN WEBSOOT</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Anton&family=Audiowide&family=Orbitron:wght@400..900&family=Russo+One&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #000000;
+            --text-color: #ffffff;
+            --accent-silver: #c0c0c0;
+            --accent-gray: #d3d3d3;
+            --glow-color: rgba(255, 255, 255, 0.7);
+            --glass-bg: rgba(255, 255, 255, 0.05);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --debris-color-1: #a0a0a0;
+            --debris-color-2: #707070;
+            --debris-color-3: #505050;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: var(--bg-color);
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background-color: var(--text-color);
+            border-radius: 10px;
+            border: 2px solid var(--bg-color);
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background-color: var(--accent-silver);
+            box-shadow: 0 0 10px var(--glow-color);
+        }
+
+
+        .particle-layer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .particle {
+            position: absolute;
+            background-color: var(--accent-silver);
+            border-radius: 50%;
+            opacity: 0;
+            animation: float 20s infinite ease-in-out, twinkle 3s infinite alternate;
+        }
+
+        .quotes-particle-layer .particle {
+             background-color: rgba(255, 255, 255, 0.6);
+             animation: float 25s infinite ease-in-out, twinkle 4s infinite alternate;
+        }
+
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) translateX(0); opacity: 0.6; }
+            50% { transform: translateY(-100px) translateX(20px); opacity: 0.8; }
+        }
+
+        @keyframes twinkle {
+             0%, 100% { opacity: 1; } /* Slightly increased base */
+             50% { opacity: 1.0; } /* Increased peak brightness */
+        }
+
+        .space-debris {
+            position: fixed; /* Fixed position relative to viewport */
+            background-color: var(--debris-color-1);
+            opacity: 0.5;
+            pointer-events: none;
+            z-index: -1; /* Behind content, potentially above parallax */
+            animation: float-debris 30s infinite linear;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.3);
+        }
+
+        @keyframes float-debris {
+            0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0.4; }
+            25% { transform: translateY(-80px) translateX(15px) rotate(45deg); opacity: 0.6; }
+            50% { transform: translateY(-30px) translateX(-10px) rotate(90deg); opacity: 0.5; }
+            75% { transform: translateY(50px) translateX(20px) rotate(135deg); opacity: 0.7; }
+            100% { transform: translateY(0) translateX(0) rotate(180deg); opacity: 0.4; }
+        }
+
+
+        .navbar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            background-color: var(--text-color);
+            color: var(--bg-color);
+            padding: 15px 5%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 15px rgba(192, 192, 192, 0.3);
+            z-index: 1000;
+            transition: background-color 0.3s ease;
+        }
+
+        .navbar .logo {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: var(--bg-color);
+            text-decoration: none;
+            font-family: 'Audiowide', sans-serif; /* Example: using Audiowide for logo */
+        }
+
+
+        .nav-links {
+            list-style: none;
+            display: flex;
+            gap: 25px;
+        }
+
+        .nav-links a {
+            color: var(--bg-color);
+            text-decoration: none;
+            font-weight: 400;
+            transition: color 0.3s ease, transform 0.3s ease;
+            position: relative;
+            padding-bottom: 5px;
+             font-family: 'Space Grotesk', sans-serif; /* Example: using Space Grotesk for nav links */
+             font-weight: 500;
+        }
+
+        .nav-links a::after {
+             content: '';
+             position: absolute;
+             width: 0;
+             height: 2px;
+             bottom: 0;
+             left: 50%;
+             transform: translateX(-50%);
+             background-color: var(--bg-color);
+             transition: width 0.3s ease;
+        }
+
+        .nav-links a:hover {
+            color: #555;
+            transform: translateY(-2px);
+        }
+         .nav-links a:hover::after {
+             width: 100%;
+         }
+
+        .rocket-flame {
+            width: 16px;
+            height: 30px;
+            background: linear-gradient(to top,
+                rgba(255, 80, 0, 1) 0%,
+                rgba(255, 165, 0, 1) 50%,
+                rgba(255, 210, 0, 0.9) 85%,
+                rgba(255, 255, 255, 0.8) 100%
+            );
+            border-radius: 50% 50% 40% 40% / 85% 85% 15% 15%;
+            margin-left: 15px;
+            position: relative;
+            transform-origin: bottom center;
+            animation: dynamic-flame 0.12s infinite linear;
+            box-shadow:
+                0 0 4px 1px rgba(255, 165, 0, 0.5),
+                0 0 8px 4px rgba(255, 80, 0, 0.3),
+                inset 0 -2px 3px rgba(255, 80, 0, 0.6);
+        }
+
+        @keyframes dynamic-flame {
+            0%, 100% {
+                transform: scaleY(1) scaleX(1) translateY(0);
+                box-shadow:
+                    0 0 4px 1px rgba(255, 165, 0, 0.5),
+                    0 0 8px 4px rgba(255, 80, 0, 0.3),
+                    inset 0 -2px 3px rgba(255, 80, 0, 0.6);
+                opacity: 1;
+            }
+            33% {
+                transform: scaleY(1.15) scaleX(0.9) translateY(-3px);
+                box-shadow:
+                    0 0 5px 2px rgba(255, 180, 0, 0.6),
+                    0 0 10px 5px rgba(255, 100, 0, 0.4),
+                    inset 0 -2px 3px rgba(255, 90, 0, 0.7);
+                opacity: 0.95;
+            }
+            66% {
+                transform: scaleY(0.9) scaleX(1.1) translateY(0);
+                 box-shadow:
+                    0 0 3px 1px rgba(255, 160, 0, 0.5),
+                    0 0 7px 3px rgba(255, 70, 0, 0.3),
+                    inset 0 -2px 3px rgba(255, 80, 0, 0.6);
+                opacity: 0.98;
+            }
+        }
+
+        .menu-toggle {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            background: none;
+            border: none;
+            padding: 0;
+            z-index: 1010; /* Ensure toggle is above navbar content but potentially below modal overlay */
+        }
+
+        .menu-toggle span {
+            height: 3px;
+            width: 25px;
+            background: var(--bg-color);
+            margin-bottom: 4px;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+            transform-origin: center;
+        }
+        .menu-toggle span:last-child {
+            margin-bottom: 0;
+        }
+
+        .menu-toggle.active span:nth-child(1) {
+             transform: translateY(7px) rotate(45deg);
+        }
+        .menu-toggle.active span:nth-child(2) {
+             opacity: 0;
+             transform: scaleX(0);
+        }
+        .menu-toggle.active span:nth-child(3) {
+             transform: translateY(-7px) rotate(-45deg);
+        }
+
+
+
+        #home {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            background: radial-gradient(ellipse at bottom, #1b2735 0%, #090a0f 100%);
+            padding: 20px;
+        }
+
+        .landing-content {
+            position: relative;
+            z-index: 2;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: opacity 0.8s ease-out 0.3s, transform 0.8s ease-out 0.3s;
+        }
+
+        #home.content-revealed .landing-content {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+
+        .apple-container {
+            position: absolute;
+            top: 40%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 5;
+            cursor: pointer;
+            transition: transform 0.6s cubic-bezier(0.45, 0.05, 0.55, 0.95), opacity 0.5s ease-in 0.4s;
+        }
+
+         .apple {
+            width: 80px;
+            height: 80px;
+             background:
+                radial-gradient(circle at 35% 30%, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0) 15%),
+                radial-gradient(ellipse at 50% 50%, #e84a4a 0%, #d43f3f 60%, #b33030 100%);
+             border-radius: 50% 50% 47% 47% / 55% 55% 45% 45%;
+            position: relative;
+            box-shadow: 0 12px 25px rgba(0, 0, 0, 0.4),
+                        inset -8px 8px 15px rgba(0,0,0,0.25);
+         }
+
+         .apple.is-floating {
+            animation: float-zero-g 6s infinite ease-in-out;
+         }
+
+         .apple::before {
+             content: '';
+             position: absolute;
+             top: -9px;
+             left: 46%;
+             width: 6px;
+             height: 16px;
+             background: linear-gradient(#7a301d, #5c2416);
+             border-radius: 3px 3px 1px 1px;
+             transform: rotate(8deg);
+             box-shadow: -1px -1px 2px rgba(0,0,0,0.3);
+         }
+          .apple::after {
+             content: '';
+             position: absolute;
+             top: -17px;
+             left: 58%;
+             width: 22px;
+             height: 12px;
+             background: linear-gradient(120deg, #5f9b3c, #4d8030);
+             border-radius: 60% 0 50% 0;
+             transform: rotate(-35deg) scaleY(0.9);
+             box-shadow: -1px 1px 3px rgba(0,0,0,0.2);
+         }
+
+
+        @keyframes float-zero-g {
+             0%, 100% { transform: translateY(0) rotate(0deg); }
+             50% { transform: translateY(-15px) rotate(5deg); }
+        }
+
+
+        #home.apple-dropped .apple-container {
+            transform: translate(-50%, 150vh);
+            opacity: 0;
+        }
+
+
+        #home h1 {
+            font-family: 'Orbitron', sans-serif; /* Added */
+            font-size: 3rem;
+            margin-bottom: 15px;
+            font-weight: 700;
+            text-shadow: 0 0 15px var(--glow-color);
+        }
+
+        #home p {
+            font-size: 1.4rem;
+            color: var(--accent-gray);
+            margin-bottom: 30px;
+            font-family: 'Space Grotesk', sans-serif; /* Example: using Space Grotesk for intro paragraph */
+            font-weight: 400;
+        }
+
+        .cta-button {
+            background: linear-gradient(45deg, var(--accent-silver), var(--text-color));
+            color: var(--bg-color);
+            padding: 12px 30px;
+            border: none;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-decoration: none;
+             font-family: 'Audiowide', sans-serif; /* Example: using Audiowide for CTA */
+        }
+
+        .cta-button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px var(--glow-color);
+        }
+
+
+        section {
+            padding: 100px 10%;
+            position: relative;
+            overflow: hidden;
+            min-height: 70vh;
+            /* Reveal on scroll */
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+         section.visible {
+            opacity: 1;
+            transform: translateY(0);
+         }
+        /* Home section doesn't need fade-in as it has its own reveal */
+        #home {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+
+        h2 {
+            font-family: 'Russo One', sans-serif; /* Added */
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 60px;
+            text-shadow: 0 0 10px var(--glow-color);
+            letter-spacing: 1px; /* Optional: Adjust spacing for Russo One */
+        }
+
+
+        #quotes {
+             background: radial-gradient(ellipse at top, #101018 0%, #000000 100%);
+             position: relative;
+        }
+
+        .quotes-particle-layer {
+             position: absolute;
+             top: 0;
+             left: 0;
+             width: 100%;
+             height: 100%;
+             pointer-events: none;
+             z-index: 0;
+             overflow: hidden;
+         }
+
+
+        .quotes-wrapper {
+             position: relative;
+             max-width: 1500px; /* Changed from 900px */
+             margin: 0 auto;
+             padding: 0 60px;
+        }
+
+        .quotes-carousel-container {
+            max-width: 100%;
+            margin: 0 auto;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: none;
+        }
+        .quotes-carousel-container::-webkit-scrollbar {
+            display: none;
+        }
+
+        .quotes-carousel {
+            display: flex;
+            gap: 30px;
+            padding: 20px 0;
+        }
+
+        .quote-card {
+            min-width: calc(33.33% - 20px); /* Default: 3 cards visible */
+            scroll-snap-align: center;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 30px; /* Adjusted padding */
+            text-align: center;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1), 0 0 15px rgba(255, 255, 255, 0.1) inset;
+            flex-shrink: 0;
+            position: relative;
+            z-index: 1;
+             /* Reveal on scroll */
+             opacity: 0;
+             transform: translateY(20px);
+             transition: opacity 0.6s ease-out 0.2s, transform 0.6s ease-out 0.2s;
+        }
+         .quote-card.visible {
+             opacity: 1;
+             transform: translateY(0);
+         }
+
+        .quote-card p {
+            font-size: 1.2rem; /* Adjusted */
+            font-style: italic;
+            color: var(--accent-gray);
+            margin-bottom: 15px;
+            line-height: 1.6;
+             font-family: 'Space Grotesk', sans-serif; /* Example: using Space Grotesk for quotes */
+             font-weight: 400;
+        }
+
+        .quote-card span {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-color);
+             font-family: 'Poppins', sans-serif; /* Keep attribution clearer */
+        }
+
+        .carousel-controls {
+            position: absolute;
+            top: 50%;
+            left: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            transform: translateY(-50%);
+            z-index: 2;
+            pointer-events: none;
+        }
+
+        .carousel-arrow {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: var(--text-color);
+            font-size: 2rem;
+            cursor: pointer;
+            border-radius: 50%;
+            width: 45px;
+            height: 45px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.3s ease, transform 0.2s ease;
+            pointer-events: all;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+        .carousel-arrow.prev {
+             left: -5px;
+        }
+        .carousel-arrow.next {
+             right: -5px;
+        }
+
+        .carousel-arrow:hover {
+            background: rgba(255, 255, 255, 0.4);
+             transform: translateY(-50%) scale(1.1);
+        }
+
+
+        #progress {
+             background: radial-gradient(circle at center, #050508, #000000);
+             padding: 150px 10%; /* Added padding */
+             min-height: 90vh; /* Increased min-height */
+        }
+        .solar-system {
+            position: relative;
+            width: 750px; /* Slightly Increased size */
+            height: 750px; /* Slightly Increased size */
+            margin: 50px auto;
+        }
+
+        .sun {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 80px;
+            height: 80px;
+            background: radial-gradient(circle, #fdf497, #f7b733);
+            border-radius: 50%;
+            box-shadow: 0 0 30px #f7b733, 0 0 60px #f7b733;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: #333;
+            text-align: center;
+            font-family: 'Audiowide', sans-serif; /* Example: Sun label */
+        }
+
+        .orbit {
+             position: absolute;
+             top: 50%;
+             left: 50%;
+             transform: translate(-50%, -50%);
+             border: 1px dashed rgba(255, 255, 255, 0.2);
+             border-radius: 50%;
+             pointer-events: none;
+        }
+
+        .planet {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 60px; /* Increased size slightly */
+            height: 60px; /* Increased size slightly */
+            border-radius: 50%;
+            cursor: pointer;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            font-size: 0.8rem; /* Increased size slightly */
+            font-weight: 600;
+            color: var(--bg-color);
+            padding: 5px;
+            animation: orbit 20s linear infinite; /* Base animation removed later */
+            font-family: 'Space Grotesk', sans-serif; /* Example: Planet labels */
+            font-weight: 700;
+             /* Reveal on scroll */
+             opacity: 0;
+             transform: scale(0.8);
+             transition: opacity 0.6s ease-out 0.3s, transform 0.6s ease-out 0.3s;
+        }
+         .planet.visible {
+             opacity: 1;
+             transform: scale(1);
+         }
+
+        .planet:hover {
+            /* Removed transform translate, handled by keyframes */
+            transform: scale(1.1); /* Simplified hover transform */
+            box-shadow: 0 0 20px var(--glow-color);
+            z-index: 10;
+        }
+
+         .planet.completed {
+             box-shadow: 0 0 25px #4caf50, 0 0 40px #4caf50;
+             background-blend-mode: luminosity;
+             filter: brightness(1.2);
+         }
+
+
+        .orbit1 { width: 280px; height: 280px; } /* Increased */
+        .planet1 {
+            background: #e74c3c;
+            animation-name: orbit1-anim;
+            animation-duration: 18s; /* Adjusted timing */
+             animation-timing-function: linear;
+             animation-iteration-count: infinite;
+        }
+
+        .orbit2 { width: 500px; height: 500px; } /* Increased */
+        .planet2 {
+            background: #f1c40f;
+            animation-name: orbit2-anim;
+            animation-duration: 30s; /* Adjusted timing */
+             animation-timing-function: linear;
+             animation-iteration-count: infinite;
+        }
+
+        .orbit3 { width: 720px; height: 720px; } /* Increased */
+        .planet3 {
+            background: #3498db;
+            animation-name: orbit3-anim;
+            animation-duration: 42s; /* Adjusted timing */
+             animation-timing-function: linear;
+             animation-iteration-count: infinite;
+        }
+
+        /* Removed orbit4 and planet4 styles */
+
+        @keyframes orbit1-anim {
+             from { transform: rotate(0deg) translateX(140px) rotate(0deg) translate(-30px, -30px); } /* Updated translateX */
+             to   { transform: rotate(360deg) translateX(140px) rotate(-360deg) translate(-30px, -30px); } /* Updated translateX */
+         }
+         @keyframes orbit2-anim {
+             from { transform: rotate(0deg) translateX(250px) rotate(0deg) translate(-30px, -30px); } /* Updated translateX */
+             to   { transform: rotate(360deg) translateX(250px) rotate(-360deg) translate(-30px, -30px); } /* Updated translateX */
+         }
+         @keyframes orbit3-anim {
+             from { transform: rotate(0deg) translateX(360px) rotate(0deg) translate(-30px, -30px); } /* Updated translateX */
+             to   { transform: rotate(360deg) translateX(360px) rotate(-360deg) translate(-30px, -30px); } /* Updated translateX */
+         }
+         /* Removed orbit4-anim */
+
+
+        .planet-info {
+            display: none;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 15px;
+            padding: 30px;
+            width: 90%; /* Adjusted width */
+            max-width: 600px; /* Increased max-width */
+            z-index: 1100;
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            text-align: center;
+        }
+        .planet-info h3 {
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+            color: var(--text-color);
+            font-family: 'Audiowide', sans-serif; /* Example: Modal title */
+        }
+        .planet-info p#planet-info-message { /* Target message p specifically */
+             margin-bottom: 10px; /* Reduced margin */
+             color: var(--accent-gray);
+             font-size: 1.1rem;
+        }
+
+        /* --- Styles for Subtopics --- */
+        .planet-info-subtopics {
+            margin-top: 15px;
+            text-align: left;
+            max-height: 350px; /* Increased max height */
+            overflow-y: auto;
+            padding: 10px;
+            background: rgba(0,0,0,0.1); /* Slight background */
+            border-radius: 8px;
+            border: 1px solid var(--glass-border);
+        }
+        .planet-info-subtopics h4 { /* Style for section titles like P1.1 */
+            margin-top: 15px;
+            margin-bottom: 8px;
+            color: var(--text-color);
+            font-weight: 600;
+            font-size: 1.1rem;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 4px;
+             font-family: 'Space Grotesk', sans-serif;
+        }
+         .planet-info-subtopics h4:first-child {
+             margin-top: 0;
+         }
+        .planet-info-subtopics ul { /* List containing individual subtopic links */
+            list-style: none;
+            padding-left: 10px; /* Indent list items slightly */
+            margin-bottom: 10px;
+        }
+        .planet-info-subtopics li { /* List item for each subtopic */
+            margin-bottom: 6px; /* Tighter spacing */
+        }
+        .planet-info-subtopics a { /* Styling for the individual clickable subtopic links */
+            color: var(--accent-silver);
+            text-decoration: none;
+            transition: color 0.3s ease, text-shadow 0.3s ease, background-color 0.3s ease; /* Added transitions */
+            display: block; /* Ensure link takes full width for click area */
+            padding: 4px 8px; /* Add padding for better clickability and visual spacing */
+            font-size: 0.95rem;
+            border-radius: 3px; /* Optional: slight rounding */
+        }
+        .planet-info-subtopics a:hover {
+            color: var(--text-color);
+            text-decoration: underline; /* Keep underline for clarity */
+            background-color: rgba(255, 255, 255, 0.05); /* Subtle hover background */
+            text-shadow: 0 0 5px var(--glow-color); /* Subtle glow on hover */
+        }
+        /* --- End Subtopic Styles --- */
+
+        .planet-info-buttons { /* Container for buttons */
+             margin-top: 20px;
+        }
+        .close-info, .mark-complete {
+             background: rgba(255, 255, 255, 0.2);
+             border: none;
+             color: var(--text-color);
+             padding: 10px 18px; /* Slightly larger buttons */
+             border-radius: 5px;
+             cursor: pointer;
+             /* margin-top: 20px; Removed, using container */
+             margin-right: 10px;
+             transition: background 0.3s ease;
+             font-family: 'Space Grotesk', sans-serif; /* Example */
+             font-weight: 500;
+             font-size: 0.9rem;
+        }
+         .close-info:hover, .mark-complete:hover {
+             background: rgba(255, 255, 255, 0.4);
+         }
+         .close-info:last-child {
+            margin-right: 0;
+        }
+
+        /* --- Start Syllabus Nebula / Topics Section Styles --- */
+        #topics {
+             background: linear-gradient(to bottom, #000000, #0a0a10);
+             text-align: center;
+             padding-bottom: 120px; /* Add extra padding at the bottom */
+        }
+        #topics h2 {
+            margin-bottom: 30px; /* Reduced margin below h2 */
+        }
+        /* --- End Syllabus Nebula / Topics Section Styles --- */
+
+        /* --- Flashcard Section Styles --- */
+        .flashcard-control-btn {
+            display: block;
+            margin: 0 auto 40px auto; /* Center button, add space below */
+            padding: 10px 25px;
+            font-size: 1rem;
+        }
+
+        .flashcard-container {
+            display: flex;
+            flex-wrap: wrap; /* Allow groups to wrap */
+            gap: 40px; /* Space between topic groups */
+            max-width: 1200px; /* Adjust width for better wrapping */
+            margin: 0 auto; /* Center container */
+            justify-content: center; /* Center groups if they wrap */
+        }
+
+        .flashcard-topic-group {
+            background: rgba(255, 255, 255, 0.02); /* Very subtle background */
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+            flex: 1 1 300px; /* Allow groups to grow/shrink, base width 300px */
+            max-width: 450px; /* Prevent groups from getting too wide */
+            display: flex; /* Use flexbox for internal layout */
+            flex-direction: column; /* Stack title and cards vertically */
+        }
+
+        .flashcard-topic-group h3 {
+            font-family: 'Audiowide', sans-serif;
+            font-size: 1.5rem;
+            color: var(--accent-silver);
+            margin-bottom: 25px;
+            text-align: center;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 10px;
+        }
+
+        .flashcard-grid { /* Container for cards within a group */
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px; /* Space between flashcards */
+            justify-content: center; /* Center cards if they don't fill the row */
+            flex-grow: 1; /* Allow grid to take up space */
+        }
+
+        .flashcard {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 8px;
+            min-height: 150px; /* Ensure cards have a decent height */
+            /* Removed fixed width, handled by flexbox on .flashcard-grid */
+            flex: 1 1 180px; /* Allow cards to grow/shrink, base width 180px */
+            max-width: 250px; /* Optional: Prevent cards getting too large */
+            cursor: pointer;
+            position: relative;
+            perspective: 1000px; /* For 3D flip effect */
+            transition: transform 0.2s ease, box-shadow 0.3s ease, opacity 0.6s ease-out, transform 0.6s ease-out; /* Combined transitions */
+            box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+            display: flex; /* Ensure inner content respects height */
+            flex-direction: column; /* Stack tag and inner */
+            /* Reveal on scroll */
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+        }
+        .flashcard.visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+
+        .flashcard:hover {
+            transform: translateY(-5px) scale(1.03); /* Adjusted hover scale */
+            box-shadow: 0 8px 20px rgba(0,0,0,0.4), 0 0 15px var(--glow-color);
+        }
+
+        .flashcard-inner {
+            position: relative; /* Changed from absolute for simpler toggle */
+            width: 100%;
+            height: 100%;
+            text-align: center;
+            transition: transform 0.6s;
+            transform-style: preserve-3d; /* Important for 3D flip */
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Center content vertically */
+            align-items: center; /* Center content horizontally */
+            flex-grow: 1; /* Allow inner to fill card height */
+        }
+
+        .flashcard-front, .flashcard-back {
+            width: 100%;
+            height: 100%;
+            -webkit-backface-visibility: hidden; /* Safari */
+            backface-visibility: hidden;
+            padding: 15px;
+            display: flex; /* Use flex to center content */
+            align-items: center;
+            justify-content: center;
+            border-radius: 8px; /* Match parent */
+            flex-grow: 1; /* Ensure front/back fill inner */
+        }
+
+        .flashcard-front {
+            background-color: transparent; /* Front is transparent */
+            color: var(--text-color);
+            font-weight: 600;
+        }
+
+        .flashcard-back {
+            background-color: rgba(0,0,0, 0.3); /* Slightly darker back */
+            color: var(--accent-gray);
+            display: none; /* Hide back by default for simple toggle */
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* Simple Toggle Show/Hide */
+         .flashcard.show-answer .flashcard-front {
+            display: none;
+         }
+         .flashcard.show-answer .flashcard-back {
+            display: flex; /* Show back when toggled */
+         }
+
+
+        .flashcard-tag {
+            /* position: absolute; */ /* No longer absolute */
+            align-self: flex-end; /* Position tag to the right */
+            /* top: 5px; */
+            /* right: 8px; */
+            padding: 2px 8px 5px 0; /* Adjust padding */
+            font-size: 0.7rem;
+            color: var(--accent-gray);
+            opacity: 0.6;
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* Responsive adjustments for flashcards */
+        @media (max-width: 900px) {
+             .flashcard {
+                 flex-basis: 200px; /* Adjust base width */
+             }
+        }
+         @media (max-width: 600px) {
+             .flashcard {
+                 flex-basis: calc(100% - 10px); /* Almost full width on small screens */
+                 min-height: 120px;
+             }
+             .flashcard-container {
+                 gap: 25px;
+             }
+             .flashcard-topic-group {
+                 padding: 15px;
+                 flex-basis: 100%; /* Full width group on small screens */
+             }
+             .flashcard-topic-group h3 {
+                 font-size: 1.3rem;
+                 margin-bottom: 15px;
+             }
+             .flashcard-front, .flashcard-back {
+                 padding: 10px;
+             }
+             .flashcard-back {
+                 font-size: 0.9rem;
+             }
+        }
+        /* --- End Flashcard Styles --- */
+
+
+        #final-boost {
+            min-height: 80vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: radial-gradient(circle at 50% 100%, #2a2a3a, #000000);
+            position: relative;
+        }
+
+        .star-animation {
+            font-size: 4rem;
+            margin-bottom: 30px;
+            animation: pulse 2s infinite ease-in-out;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); text-shadow: 0 0 15px var(--glow-color); }
+            50% { transform: scale(1.1); text-shadow: 0 0 30px var(--glow-color); }
+        }
+
+
+        #final-boost .boost-message h3 {
+            font-size: 2.8rem;
+            margin-bottom: 20px;
+            font-weight: 700;
+            line-height: 1.4;
+            opacity: 0;
+            animation: fadeIn 2s ease-out 0.5s forwards;
+            font-family: 'Orbitron', sans-serif; /* Example: Final boost message */
+        }
+
+        #final-boost .personal-message {
+            font-size: 1.3rem;
+            color: var(--accent-silver);
+            margin-top: 30px;
+            font-style: italic;
+            max-width: 600px;
+             opacity: 0;
+             animation: fadeIn 2s ease-out 1s forwards;
+             font-family: 'Space Grotesk', sans-serif; /* Example */
+        }
+        #your-image-id { /* Basic styling for the added image */
+             max-width: 80%; /* Prevent image from being too wide */
+             height: auto; /* Maintain aspect ratio */
+             border-radius: 10px; /* Optional rounded corners */
+             margin-top: 20px; /* Space above the image */
+             box-shadow: 0 0 15px rgba(255, 255, 255, 0.2); /* Optional subtle glow */
+        }
+
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+
+
+        .floating-element {
+            position: absolute;
+            font-size: 1.5rem;
+            color: rgba(255, 255, 255, 0.15);
+            pointer-events: none;
+            animation: drift 30s infinite linear alternate;
+            z-index: -1;
+            opacity: 0; /* Initial state */
+            font-family: 'Orbitron', sans-serif; /* Example: Floating formulae */
+        }
+
+        @keyframes drift {
+             0% { transform: translateY(0px) translateX(0px) rotate(0deg); opacity: 0.1; }
+             50% { transform: translateY(-40px) translateX(20px) rotate(10deg); opacity: 0.2; }
+             100% { transform: translateY(0px) translateX(0px) rotate(0deg); opacity: 0.1; }
+        }
+
+
+        footer {
+            text-align: center;
+            padding: 20px;
+            font-size: 0.9rem;
+            color: var(--accent-gray);
+            margin-top: 50px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+             font-family: 'Space Grotesk', sans-serif; /* Example */
+        }
+
+
+
+        .parallax-layer {
+            position: fixed; /* Changed from absolute to fixed */
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            background-size: cover; /* Changed from 'cover' for radial gradients */
+            background-repeat: no-repeat;
+            /* Removed transition: transform 0.1s linear; - will be handled by JS if needed, or let animation handle it */
+             z-index: -2;
+             /* Base twinkle animation for stars */
+             animation: parallax-twinkle 5s infinite alternate ease-in-out;
+        }
+         .parallax-layer.stars-far {
+             background: radial-gradient(1px 1px at 20% 30%, white, transparent),
+                         radial-gradient(1px 1px at 80% 60%, white, transparent),
+                         radial-gradient(2px 2px at 50% 90%, white, transparent),
+                         radial-gradient(1px 1px at 15% 75%, white, transparent),
+                         radial-gradient(1px 1px at 65% 45%, white, transparent),
+                         radial-gradient(1px 1px at 5% 10%, white, transparent),
+                         radial-gradient(1px 1px at 95% 80%, white, transparent);
+             background-size: 100% 100%;
+             opacity: 0.4; /* Slightly dimmer */
+             animation-duration: 7s; /* Slower twinkle */
+         }
+         .parallax-layer.stars-near {
+             background: radial-gradient(2px 2px at 10% 80%, silver, transparent),
+                         radial-gradient(3px 3px at 70% 20%, silver, transparent),
+                         radial-gradient(2px 2px at 40% 50%, silver, transparent),
+                         radial-gradient(2px 2px at 85% 85%, silver, transparent),
+                         radial-gradient(3px 3px at 25% 15%, silver, transparent),
+                         radial-gradient(2px 2px at 55% 65%, silver, transparent),
+                         radial-gradient(2px 2px at 90% 40%, silver, transparent);
+             background-size: 100% 100%;
+             opacity: 0.7; /* Slightly less intense */
+             animation-duration: 5s; /* Base twinkle speed */
+         }
+          .parallax-layer.nebula {
+              background: radial-gradient(ellipse at 70% 30%, rgba(150, 50, 200, 0.2) 0%, transparent 70%),
+                          radial-gradient(ellipse at 30% 80%, rgba(50, 150, 200, 0.15) 0%, transparent 60%);
+              opacity: 0.6;
+              animation: nebula-drift 60s infinite alternate ease-in-out; /* Add subtle drift to nebula */
+         }
+
+         @keyframes parallax-twinkle {
+             from { opacity: 0.3; }
+             to   { opacity: 1.0; } /* Increased brightness */
+         }
+         /* Adjust opacity ranges per layer if needed */
+        .parallax-layer.stars-far { animation-name: parallax-twinkle-far; }
+        @keyframes parallax-twinkle-far {
+            from { opacity: 0.2; } to   { opacity: 0.7; } /* Increased brightness */
+        }
+        .parallax-layer.stars-near { animation-name: parallax-twinkle-near; }
+        @keyframes parallax-twinkle-near {
+            from { opacity: 0.5; } to   { opacity: 1.0; } /* Increased brightness */
+        }
+        @keyframes nebula-drift {
+            from { transform: translate(0, 0) scale(1); opacity: 0.5; }
+            to   { transform: translate(10px, -15px) scale(1.02); opacity: 0.7; }
+        }
+
+        /* --- Media Query Adjustments --- */
+        @media (max-width: 1024px) {
+            #home h1 { font-size: 2.5rem; } /* Orbitron */
+            #home p { font-size: 1.2rem; }
+            h2 { font-size: 2rem; } /* Russo One */
+            .quote-card { min-width: calc(50% - 15px); padding: 25px; } /* 2 cards */
+            .quote-card p { font-size: 1.1rem; }
+            .quotes-wrapper { padding: 0 40px; }
+            .quotes-carousel { gap: 20px; }
+            .carousel-arrow.prev { left: -10px; }
+            .carousel-arrow.next { right: -10px; }
+
+            .solar-system { width: 550px; height: 550px; } /* Adjusted size */
+            .sun { width: 65px; height: 65px; font-size: 0.7rem;}
+            .planet { width: 50px; height: 50px; font-size: 0.7rem;} /* Adjusted */
+
+            .orbit1 { width: 220px; height: 220px; } /* Adjusted */
+            @keyframes orbit1-anim-1024 { from { transform: rotate(0deg) translateX(110px) rotate(0deg) translate(-25px, -25px); } to { transform: rotate(360deg) translateX(110px) rotate(-360deg) translate(-25px, -25px); } } /* Adjusted */
+            .planet1 { animation-name: orbit1-anim-1024; }
+
+            .orbit2 { width: 380px; height: 380px; } /* Adjusted */
+            @keyframes orbit2-anim-1024 { from { transform: rotate(0deg) translateX(190px) rotate(0deg) translate(-25px, -25px); } to { transform: rotate(360deg) translateX(190px) rotate(-360deg) translate(-25px, -25px); } } /* Adjusted */
+            .planet2 { animation-name: orbit2-anim-1024; }
+
+            .orbit3 { width: 540px; height: 540px; } /* Adjusted */
+            @keyframes orbit3-anim-1024 { from { transform: rotate(0deg) translateX(270px) rotate(0deg) translate(-25px, -25px); } to { transform: rotate(360deg) translateX(270px) rotate(-360deg) translate(-25px, -25px); } } /* Adjusted */
+            .planet3 { animation-name: orbit3-anim-1024; }
+
+            #final-boost .boost-message h3 { font-size: 2rem; } /* Orbitron */
+            #final-boost .personal-message { font-size: 1.1rem; }
+            .planet-info { max-width: 550px; }
+            .planet-info-subtopics { max-height: 320px; } /* Adjust height for potentially longer lists */
+            .flashcard-container { max-width: 90%; }
+        }
+
+
+        @media (max-width: 768px) {
+            section { padding: 80px 5%; }
+            .navbar { padding: 15px 5%; }
+            .nav-links {
+                flex-direction: column;
+                position: fixed;
+                top: 0;
+                left: -100%;
+                width: 80%;
+                max-width: 300px;
+                height: 100vh;
+                background-color: var(--text-color);
+                padding: 80px 20px 20px 20px;
+                box-shadow: 5px 0 15px rgba(0, 0, 0, 0.2);
+                transition: left 0.4s ease-in-out;
+                z-index: 1001; /* Above navbar */
+                display: flex;
+                align-items: center;
+                overflow-y: auto; /* Allow scroll if menu is long */
+            }
+            .nav-links.active {
+                left: 0;
+            }
+            .nav-links li {
+                text-align: center;
+                padding: 15px 0;
+                width: 100%;
+            }
+             .nav-links a {
+                font-size: 1.2rem;
+                color: var(--bg-color); /* Ensure links are visible on white background */
+             }
+             .nav-links a:hover { color: #555; }
+             .nav-links a::after { display: none; }
+
+            .menu-toggle {
+                display: flex;
+                z-index: 1002; /* Above mobile menu */
+            }
+
+            .rocket-flame {
+                 display: none;
+             }
+
+            #progress { padding: 100px 5%; } /* Adjusted padding */
+            #home h1 { font-size: 2rem; } /* Orbitron */
+            #home p { font-size: 1rem; }
+            h2 { font-size: 1.8rem; margin-bottom: 40px;} /* Russo One */
+
+             .apple {width: 60px; height: 60px;}
+             .apple::before {top: -7px; width: 5px; height: 13px;}
+             .apple::after {top: -14px; width: 18px; height: 10px;}
+
+            .quotes-wrapper { padding: 0 15px; max-width: 100%;} /* Reduced padding */
+            .quote-card { min-width: calc(90% - 20px); padding: 20px; } /* Mostly 1 card visible */
+            .quotes-carousel { gap: 15px; padding: 10px 5%; /* Add padding to center single card */ }
+             .quote-card p { font-size: 1rem; }
+
+             .carousel-arrow { width: 35px; height: 35px; font-size: 1.5rem; background: rgba(255, 255, 255, 0.1); }
+             .carousel-arrow.prev { left: 5px; }
+             .carousel-arrow.next { right: 5px; }
+
+             .solar-system { width: 320px; height: 320px; } /* Adjusted size */
+             .sun { width: 55px; height: 55px; font-size: 0.6rem;}
+             .planet { width: 40px; height: 40px; font-size: 0.6rem;} /* Adjusted */
+
+             .orbit1 { width: 130px; height: 130px; } /* Adjusted */
+             @keyframes orbit1-anim-768 { from { transform: rotate(0deg) translateX(65px) rotate(0deg) translate(-20px, -20px); } to { transform: rotate(360deg) translateX(65px) rotate(-360deg) translate(-20px, -20px); } } /* Adjusted */
+             .planet1 { animation-name: orbit1-anim-768; }
+
+             .orbit2 { width: 220px; height: 220px; } /* Adjusted */
+              @keyframes orbit2-anim-768 { from { transform: rotate(0deg) translateX(110px) rotate(0deg) translate(-20px, -20px); } to { transform: rotate(360deg) translateX(110px) rotate(-360deg) translate(-20px, -20px); } } /* Adjusted */
+              .planet2 { animation-name: orbit2-anim-768; }
+
+             .orbit3 { width: 310px; height: 310px; } /* Adjusted */
+              @keyframes orbit3-anim-768 { from { transform: rotate(0deg) translateX(155px) rotate(0deg) translate(-20px, -20px); } to { transform: rotate(360deg) translateX(155px) rotate(-360deg) translate(-20px, -20px); } } /* Adjusted */
+              .planet3 { animation-name: orbit3-anim-768; }
+
+
+             .planet-info { width: 90%; padding: 25px; max-width: 90%; } /* Adjusted padding/width */
+             .planet-info h3 {font-size: 1.5rem;}
+             .planet-info p#planet-info-message {font-size: 1rem;}
+             .planet-info-subtopics { max-height: 280px; } /* Adjusted */
+             .planet-info-subtopics a { font-size: 0.9rem; padding: 3px 6px; } /* Adjust link size */
+
+             #final-boost .boost-message h3 { font-size: 1.8rem; } /* Orbitron */
+             #final-boost .personal-message { font-size: 1rem; }
+
+             .floating-element { display: none; } /* Hide floating elements on mobile */
+             .space-debris { display: none; }
+
+             #mobile-menu-overlay {
+                 position: fixed;
+                 top: 0;
+                 left: 0;
+                 width: 100%;
+                 height: 100%;
+                 background: rgba(0, 0, 0, 0.5);
+                 z-index: 1000; /* Below nav links but above content */
+                 opacity: 0;
+                 visibility: hidden;
+                 transition: opacity 0.4s ease-in-out, visibility 0.4s ease-in-out;
+             }
+             #mobile-menu-overlay.active {
+                 opacity: 1;
+                 visibility: visible;
+             }
+
+            .flashcard-container { gap: 25px; max-width: 100%; }
+            .flashcard-topic-group { padding: 20px; flex-basis: 100%; }
+            .flashcard { flex-basis: calc(50% - 10px); min-height: 140px;} /* 2 cards */
+
+        }
+
+         @media (max-width: 480px) {
+             #home h1 { font-size: 1.8rem; } /* Orbitron */
+             #home p { font-size: 0.9rem; }
+             .cta-button { font-size: 1rem; padding: 10px 25px; }
+             h2 { font-size: 1.5rem;} /* Russo One */
+             .quotes-wrapper { padding: 0 10px; }
+             .quote-card { min-width: calc(95% - 10px); padding: 15px; } /* Even smaller */
+             .quotes-carousel { gap: 10px; padding: 10px 2.5%; }
+             .carousel-arrow { width: 30px; height: 30px; font-size: 1.2rem;}
+             .carousel-arrow.prev { left: 2px; }
+             .carousel-arrow.next { right: 2px; }
+
+             .solar-system { width: 280px; height: 280px; } /* Adjusted size */
+             .sun { width: 45px; height: 45px; font-size: 0.5rem;}
+             .planet { width: 35px; height: 35px; font-size: 0.55rem; } /* Adjusted */
+
+             .orbit1 { width: 110px; height: 110px; } /* Adjusted */
+             @keyframes orbit1-anim-480 { from { transform: rotate(0deg) translateX(55px) rotate(0deg) translate(-17.5px, -17.5px); } to { transform: rotate(360deg) translateX(55px) rotate(-360deg) translate(-17.5px, -17.5px); } } /* Adjusted */
+             .planet1 { animation-name: orbit1-anim-480; }
+
+             .orbit2 { width: 190px; height: 190px; } /* Adjusted */
+             @keyframes orbit2-anim-480 { from { transform: rotate(0deg) translateX(95px) rotate(0deg) translate(-17.5px, -17.5px); } to { transform: rotate(360deg) translateX(95px) rotate(-360deg) translate(-17.5px, -17.5px); } } /* Adjusted */
+             .planet2 { animation-name: orbit2-anim-480; }
+
+             .orbit3 { width: 270px; height: 270px; } /* Adjusted */
+             @keyframes orbit3-anim-480 { from { transform: rotate(0deg) translateX(135px) rotate(0deg) translate(-17.5px, -17.5px); } to { transform: rotate(360deg) translateX(135px) rotate(-360deg) translate(-17.5px, -17.5px); } } /* Adjusted */
+             .planet3 { animation-name: orbit3-anim-480; }
+
+             #final-boost .boost-message h3 { font-size: 1.5rem; } /* Orbitron */
+             #final-boost .personal-message { font-size: 0.9rem; }
+             .planet-info { padding: 20px; }
+             .planet-info-subtopics { max-height: 220px; } /* Adjusted */
+             .planet-info-subtopics a { font-size: 0.85rem; padding: 2px 5px; } /* Adjust link size */
+             .close-info, .mark-complete { padding: 8px 15px; font-size: 0.8rem; }
+             .flashcard { flex-basis: 100%; min-height: 110px; } /* 1 card */
+             .flashcard-topic-group h3 { font-size: 1.2rem; }
+             .flashcard-front { font-size: 0.9rem; }
+             .flashcard-back { font-size: 0.85rem; }
+         }
+
+        /* --- Subtopic Content Box Styles --- */
+        .subtopic-overlay {
+            position: fixed;
+            inset: 0; /* top, right, bottom, left = 0 */
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1200;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+        }
+        .subtopic-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .subtopic-box {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.95); /* Start slightly scaled down */
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            padding: 40px 30px 30px 30px; /* More padding top for close button */
+            width: 90%;
+            max-width: 600px; /* Slightly increased max-width */
+            z-index: 1210;
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4), 0 0 20px var(--glow-color) inset; /* Added inner glow */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out, transform 0.3s ease-in-out;
+            color: var(--text-color);
+            text-align: left; /* Align content left */
+            display: flex; /* Use flex for layout */
+            flex-direction: column; /* Stack title and content */
+        }
+        .subtopic-box.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1); /* Scale to full size */
+        }
+
+        #subtopic-box-content {
+             font-family: 'Space Grotesk', sans-serif;
+             max-height: 70vh; /* Increased max height for content */
+             overflow-y: auto; /* Enable scrolling */
+             padding-right: 15px; /* Add padding for scrollbar */
+             scroll-behavior: smooth; /* Smooth scroll within box */
+        }
+        #subtopic-box-title { /* Style the title inside the box */
+            font-family: 'Audiowide', sans-serif;
+            font-size: 1.4rem;
+            color: var(--text-color);
+            margin-bottom: 15px;
+            border-bottom: 1px solid var(--glass-border);
+            padding-bottom: 8px;
+        }
+        #subtopic-box-summary { /* Style the summary paragraph */
+            font-size: 1rem; /* Slightly smaller than planet message */
+            color: var(--accent-gray);
+            line-height: 1.7; /* Improve readability */
+        }
+
+
+        /* Customize scrollbar for content box */
+        #subtopic-box-content::-webkit-scrollbar {
+            width: 6px;
+        }
+        #subtopic-box-content::-webkit-scrollbar-track {
+            background: rgba(255,255,255,0.1);
+            border-radius: 3px;
+        }
+        #subtopic-box-content::-webkit-scrollbar-thumb {
+            background-color: var(--accent-silver);
+            border-radius: 3px;
+        }
+         #subtopic-box-content::-webkit-scrollbar-thumb:hover {
+            background-color: var(--text-color);
+         }
+
+
+        .close-subtopic-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: transparent;
+            border: none;
+            color: var(--accent-gray);
+            font-size: 1.8rem; /* Make 'x' bigger */
+            font-weight: 300; /* Lighter weight for 'x' */
+            line-height: 1;
+            cursor: pointer;
+            padding: 5px;
+            transition: color 0.3s ease, transform 0.3s ease;
+        }
+        .close-subtopic-btn:hover {
+            color: var(--text-color);
+            transform: scale(1.1);
+        }
+        /* --- End Subtopic Content Box Styles --- */
+
+
+    </style>
+</head>
+<body>
+    <div id="space-debris-container"></div> <!-- Added container for debris -->
+
+    <div class="particle-layer" id="particle-layer">
+    </div>
+
+    <div class="parallax-layer stars-far" data-speed="0.1"></div>
+    <div class="parallax-layer nebula" data-speed="0.2"></div>
+    <div class="parallax-layer stars-near" data-speed="0.3"></div>
+
+
+    <nav class="navbar">
+        <a href="#home" class="logo">PHYSCISLIYAH 🚀 WEBSOOT 😈</a>
+        <button class="menu-toggle" id="menu-toggle" aria-label="Toggle navigation" aria-expanded="false" aria-controls="nav-links">
+            <span></span>
+            <span></span>
+            <span></span>
+        </button>
+        <ul class="nav-links" id="nav-links">
+            <li><a href="#home">Home</a></li>
+            <li><a href="#quotes">Quotes</a></li>
+            <li><a href="#progress">Progress</a></li>
+            <li><a href="#topics">Topics</a></li>
+            <li><a href="#final-boost">Final Boost</a></li>
+        </ul>
+        <div class="rocket-flame"></div>
+    </nav>
+    <div id="mobile-menu-overlay"></div>
+
+
+    <section id="home">
+         <div class="apple-container" id="apple-container">
+             <div class="apple" id="landing-apple"></div>
+         </div>
+         <div class="landing-content">
+            <h1>Gravity attracted the apple.<br>You attracted me lilbae 😈 HEY!</h1>
+            <p>Your journey through the cosmos of physics starts now.</p>
+            <a href="#quotes" class="cta-button">STARTEN ZA LOCKEN</a>
+        </div>
+    </section>
+
+    <section id="quotes" class="revealable">
+        <div class="quotes-particle-layer" id="quotes-particle-layer"></div>
+        <h2>WISDDDDDDDDDDDDDDDDDOM FROM THE STARS (this d key bruh)</h2>
+        <div class="quotes-wrapper">
+            <div class="quotes-carousel-container" id="quotes-container">
+                <div class="quotes-carousel" id="quotes-carousel">
+                    <div class="quote-card revealable">
+                        <p>"Even newton couldnt explain the force you have on my heart babygirl 😼"</p>
+                        <span>- Hasarn Kharn</span>
+                    </div>
+                    <div class="quote-card revealable">
+                        <p>"Imagination > Knowledge frfr. Dream big, then figure out the physics" (this is so corny im never letting gpt write again)</p>
+                        <span>- Einstein Vibes</span>
+                    </div>
+                    <div class="quote-card revealable">
+                        <p>"The universe is low-key chaotic but, like, beautifully simple underneath. Find the patterns."</p>
+                        <span>- Feynman Feels</span>
+                    </div>
+                     <div class="quote-card revealable">
+                         <p>"Bruh, even black holes radiate. Nothing is truly lost, especially not your effort. Keep glowing."</p>
+                         <span>- Hawking's Hope</span>
+                     </div>
+                     <div class="quote-card revealable">
+                         <p>"It's not about never failing, it's about the yap yap yap (i ended up lettign gpt write anyway😭😭)"</p>
+                         <span>- Curie Courage</span>
+                     </div>
+                </div>
+            </div>
+            <div class="carousel-controls">
+                <button class="carousel-arrow prev" id="prev-quote">❮</button>
+                <button class="carousel-arrow next" id="next-quote">❯</button>
+            </div>
+        </div>
+    </section>
+
+    <section id="progress" class="revealable">
+        <h2>ZAA PLANETARY PROGRESS</h2>
+        <div class="solar-system" id="solar-system">
+             <div class="sun">Year 11<br>Physics</div>
+             <div class="orbit orbit1"></div>
+             <div class="planet planet1"
+                  data-topic="P1 Matter"
+                  data-message="Exploring the fundamental building blocks and states of matter."
+                  data-subtopics='{"P1.1 The particle model": {"P1.1.1": "The model of the atom 1", "P1.1.2": "The model of the atom 2"}, "P1.2 Changes of state": {"P1.2.1": "Density", "P1.2.2": "Energy and temperature", "P1.2.3": "Specific heat capacity", "P1.2.4": "Specific latent heat", "P1.2.5": "Gas pressure and temperature"}}'>
+                 P1 Matter
+             </div>
+
+             <div class="orbit orbit2"></div>
+             <div class="planet planet2"
+                  data-topic="P2 Forces"
+                  data-message="Understanding motion, interactions, and Newton's laws."
+                  data-subtopics='{"P2.1 Motion": {"P2.1.1": "Distance, time, and speed", "P2.1.2": "Vectors and scalars", "P2.1.3": "Acceleration", "P2.1.4": "Distance–time graphs", "P2.1.5": "Velocity–time graphs", "P2.1.6": "Equations of motion and kinetic energy", "P2.1 Summary": "Summary questions", "P2.1 Revision": "Revision questions"}, "P2.2 Newton’s Laws": {"P2.2.1": "Forces and interactions", "P2.2.2": "Free body diagrams", "P2.2.3": "Newton’s First Law", "P2.2.4": "Newton’s Second Law", "P2.2.5": "Everyday forces and their effects", "P2.2.6": "Momentum", "P2.2.7": "Work and power", "P2.2 Summary": "Summary questions", "P2.2 Revision": "Revision questions"}}'>
+                 P2 Forces
+            </div>
+
+             <div class="orbit orbit3"></div>
+             <div class="planet planet3"
+                  data-topic="P3 Electricity & Magnetism"
+                  data-message="Delving into charges, circuits, fields, and their applications."
+                  data-subtopics='{"P3.1 Static and charge": {"P3.1.1": "Electrostatics", "P3.1.2": "Electric current"}, "P3.2 Simple circuits": {"P3.2.1": "Circuits and potential difference", "P3.2.2": "Series and parallel circuits", "P3.2.3": "Resistance", "P3.2.4": "Graphs of p.d. and current", "P3.2.5": "LDRs and thermistors", "P3.2.6": "Net resistance and circuit calculations", "P3.2.7": "Sensing circuits", "P3.2.8": "Electrical power"}, "P3.3 Magnets and magnetic fields": {"P3.3.1": "Magnets and magnetic fields", "P3.3.2": "Currents and fields", "P3.3.3": "Currents and forces", "P3.3.4": "Motors"}}'>
+                 P3 E&M
+            </div>
+
+            <!-- Removed Planet 4 -->
+
+        </div>
+         <div class="planet-info" id="planet-info">
+             <h3 id="planet-info-title">Topic Title</h3>
+             <p id="planet-info-message">Motivational message here.</p>
+             <div class="planet-info-subtopics" id="planet-info-subtopics">
+                <!-- Subtopic links will be generated here by JS -->
+             </div>
+             <div class="planet-info-buttons">
+                 <button class="mark-complete" id="mark-complete-btn">Mark as Complete ✨</button>
+                 <button class="close-info" id="close-info-btn">Close</button>
+            </div>
+         </div>
+         <div id="overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 1050;"></div>
+    </section>
+
+    <!-- ==== TOPICS / FLASHCARD SECTION ==== -->
+    <section id="topics" class="revealable">
+         <h2>TIME FOR FLASHCOORDS</h2>
+         <button id="randomize-flashcards" class="cta-button flashcard-control-btn">SHUFFLE EM! 😈🔀</button>
+
+         <div class="flashcard-container" id="flashcard-container">
+
+             <!-- P1 Matter Flashcards -->
+             <div class="flashcard-topic-group">
+                 <h3>P1 Matter</h3>
+                 <div class="flashcard-grid">
+                     <div class="flashcard revealable" data-topic="P1">
+                         <div class="flashcard-tag">P1.1</div>
+                         <div class="flashcard-inner">
+                             <div class="flashcard-front">
+                                 <p>What is the particle model of matter?</p>
+                             </div>
+                             <div class="flashcard-back">
+                                 <p>All matter is made of tiny, moving particles; their arrangement determines states.</p>
+                             </div>
+                         </div>
+                     </div>
+                     <div class="flashcard revealable" data-topic="P1">
+                         <div class="flashcard-tag">P1.2.1</div>
+                         <div class="flashcard-inner">
+                             <div class="flashcard-front">
+                                  <p>Define density</p>
+                             </div>
+                             <div class="flashcard-back">
+                                 <p>Density = mass/volume, measures particle packing tightness.</p>
+                             </div>
+                         </div>
+                     </div>
+                     <div class="flashcard revealable" data-topic="P1">
+                         <div class="flashcard-tag">P1.2.3</div>
+                         <div class="flashcard-inner">
+                             <div class="flashcard-front">
+                                 <p>What is specific heat capacity?</p>
+                             </div>
+                             <div class="flashcard-back">
+                                  <p>Energy needed to raise 1kg of a substance by 1°C, in J/kg°C.</p>
+                             </div>
+                         </div>
+                     </div>
+                     <div class="flashcard revealable" data-topic="P1">
+                         <div class="flashcard-tag">P1.2.5</div>
+                         <div class="flashcard-inner">
+                             <div class="flashcard-front">
+                                  <p>How does gas pressure change with temperature?</p>
+                             </div>
+                             <div class="flashcard-back">
+                                  <p>Pressure increases as particles move faster and collide more frequently.</p>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+             </div>
+
+             <!-- P2 Forces Flashcards -->
+             <div class="flashcard-topic-group">
+                <h3>P2 Forces</h3>
+                <div class="flashcard-grid">
+                    <div class="flashcard revealable" data-topic="P2">
+                        <div class="flashcard-tag">P2.1.2</div>
+                        <div class="flashcard-inner">
+                            <div class="flashcard-front">
+                                <p>What’s the difference between speed and velocity?</p>
+                            </div>
+                            <div class="flashcard-back">
+                                <p>Speed is scalar; velocity includes direction.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flashcard revealable" data-topic="P2">
+                        <div class="flashcard-tag">P2.1.4</div>
+                        <div class="flashcard-inner">
+                             <div class="flashcard-front">
+                                <p>What does a distance-time graph’s slope represent?</p>
+                             </div>
+                             <div class="flashcard-back">
+                                 <p>Speed; steeper slope = faster motion.</p>
+                             </div>
+                        </div>
+                    </div>
+                    <div class="flashcard revealable" data-topic="P2">
+                        <div class="flashcard-tag">P2.2.3</div>
+                         <div class="flashcard-inner">
+                             <div class="flashcard-front">
+                                <p>State Newton’s First Law</p>
+                             </div>
+                             <div class="flashcard-back">
+                                <p>Objects stay at rest/uniform motion unless acted upon by a force.</p>
+                             </div>
+                         </div>
+                    </div>
+                    <div class="flashcard revealable" data-topic="P2">
+                        <div class="flashcard-tag">P2.2.6</div>
+                        <div class="flashcard-inner">
+                             <div class="flashcard-front">
+                                 <p>What is momentum?</p>
+                             </div>
+                             <div class="flashcard-back">
+                                 <p>mass × velocity, conserved in collisions.</p>
+                             </div>
+                         </div>
+                    </div>
+                    <div class="flashcard revealable" data-topic="P2">
+                         <div class="flashcard-tag">P2.2.7</div>
+                         <div class="flashcard-inner">
+                             <div class="flashcard-front">
+                                  <p>How is work calculated?</p>
+                             </div>
+                             <div class="flashcard-back">
+                                  <p>Work = force × distance in force’s direction, in Joules.</p>
+                             </div>
+                         </div>
+                    </div>
+                 </div>
+            </div>
+
+            <!-- P3 Electricity & Magnetism Flashcards -->
+            <div class="flashcard-topic-group">
+                <h3>P3 Electricity & Magnetism</h3>
+                <div class="flashcard-grid">
+                    <div class="flashcard revealable" data-topic="P3">
+                         <div class="flashcard-tag">P3.2.2</div>
+                         <div class="flashcard-inner">
+                            <div class="flashcard-front">
+                                <p>Compare series and parallel circuits</p>
+                            </div>
+                            <div class="flashcard-back">
+                                <p>Series: same current, shared voltage; Parallel: same voltage, shared current.</p>
+                            </div>
+                         </div>
+                    </div>
+                    <div class="flashcard revealable" data-topic="P3">
+                        <div class="flashcard-tag">P3.2.6</div>
+                        <div class="flashcard-inner">
+                             <div class="flashcard-front">
+                                <p>How does total resistance behave in series?</p>
+                             </div>
+                             <div class="flashcard-back">
+                                 <p>Adds up: R₁ + R₂ + ...</p>
+                             </div>
+                        </div>
+                    </div>
+                    <div class="flashcard revealable" data-topic="P3">
+                         <div class="flashcard-tag">P3.2.5</div>
+                         <div class="flashcard-inner">
+                             <div class="flashcard-front">
+                                <p>How does an LDR work?</p>
+                             </div>
+                             <div class="flashcard-back">
+                                 <p>Resistance decreases with more light.</p>
+                             </div>
+                         </div>
+                     </div>
+                    <div class="flashcard revealable" data-topic="P3">
+                         <div class="flashcard-tag">P3.3.2</div>
+                         <div class="flashcard-inner">
+                             <div class="flashcard-front">
+                                 <p>What rule describes a wire’s magnetic field?</p>
+                             </div>
+                             <div class="flashcard-back">
+                                 <p>Right-hand grip rule: thumb = current, fingers = field.</p>
+                             </div>
+                         </div>
+                    </div>
+                    <div class="flashcard revealable" data-topic="P3">
+                         <div class="flashcard-tag">P3.3.4</div>
+                         <div class="flashcard-inner">
+                             <div class="flashcard-front">
+                                 <p>What principle powers electric motors?</p>
+                             </div>
+                             <div class="flashcard-back">
+                                 <p>Current in a magnetic field experiences force via Fleming’s Left-Hand Rule.</p>
+                             </div>
+                         </div>
+                     </div>
+                 </div>
+            </div>
+
+            <!-- Formula Flashcards -->
+             <div class="flashcard-topic-group">
+                 <h3>Key Formulas</h3>
+                 <div class="flashcard-grid">
+                     <div class="flashcard revealable" data-topic="Formula">
+                          <div class="flashcard-tag">P3.2.3</div>
+                          <div class="flashcard-inner">
+                              <div class="flashcard-front">
+                                 <p>Ohm’s Law</p>
+                             </div>
+                              <div class="flashcard-back">
+                                 <p>V = I × R</p>
+                             </div>
+                          </div>
+                     </div>
+                     <div class="flashcard revealable" data-topic="Formula">
+                         <div class="flashcard-tag">P3.2.8</div>
+                         <div class="flashcard-inner">
+                             <div class="flashcard-front">
+                                 <p>Electrical power</p>
+                             </div>
+                             <div class="flashcard-back">
+                                  <p>P = I × V</p>
+                             </div>
+                         </div>
+                     </div>
+                     <div class="flashcard revealable" data-topic="Formula">
+                          <div class="flashcard-tag">P2.1.6</div>
+                          <div class="flashcard-inner">
+                              <div class="flashcard-front">
+                                 <p>Kinetic energy</p>
+                             </div>
+                              <div class="flashcard-back">
+                                  <p>KE = ½mv²</p>
+                             </div>
+                          </div>
+                     </div>
+                 </div>
+             </div>
+
+         </div> <!-- End flashcard-container -->
+     </section>
+    <!-- ==== END TOPICS / FLASHCARD SECTION ==== -->
+
+
+    <section id="final-boost" class="revealable">
+        <div class="star-animation">🌟</div>
+         <div class="boost-message">
+            <h3>Aliyah,<br>You’re not just studying physics...🥹<br>YOURE STUDYEN OSSS ZAA FAMILOY HASARN KAOKAOKHARN ASHEROOOORROROORBILLAYBABAY.</h3>
+         </div>
+         <div class="personal-message" id="personal-message">
+             <p>Hey baby, I wanted to say I'm incredibly proud of how hard youve been grinden 💘. Stay za focused and know that I'm rooting for you on every step of the way. Bros the goat afterall 😼!</p>
+         </div>
+         <br>
+         <img src="gota.jpg" alt="goat" id="your-image-id" class="your-image-class">
+         <br>
+    </section>
+
+    <footer>
+        <p>© 2025 Asherbillay and KaokaoKharn Productions 🥌</p>
+    </footer>
+
+
+     <div id="floating-formulae-container"></div>
+
+    <!-- Subtopic Content Box HTML (Add this before closing </body>) -->
+    <div id="subtopic-content-overlay" class="subtopic-overlay"></div>
+    <div id="subtopic-content-box" class="subtopic-box">
+        <button id="close-subtopic-box" class="close-subtopic-btn" aria-label="Close Content Box">×</button>
+        <div id="subtopic-box-content">
+             <!-- Content will be injected here by JS -->
+             <h4 id="subtopic-box-title">Subtopic Title</h4> <!-- Added title element -->
+             <p id="subtopic-box-summary"></p> <!-- Placeholder for summary -->
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const body = document.body;
+
+
+            const menuToggle = document.getElementById('menu-toggle');
+            const navLinks = document.getElementById('nav-links');
+            const mobileMenuOverlay = document.getElementById('mobile-menu-overlay');
+
+            if (menuToggle && navLinks && mobileMenuOverlay) {
+                 const toggleMenu = () => {
+                     const isActive = navLinks.classList.contains('active');
+                     navLinks.classList.toggle('active');
+                     menuToggle.classList.toggle('active');
+                     mobileMenuOverlay.classList.toggle('active');
+                     menuToggle.setAttribute('aria-expanded', !isActive);
+                     body.style.overflow = isActive ? '' : 'hidden'; // Prevent body scroll when mobile menu active
+                 };
+
+                menuToggle.addEventListener('click', toggleMenu);
+                mobileMenuOverlay.addEventListener('click', toggleMenu);
+
+
+                navLinks.querySelectorAll('a').forEach(link => {
+                    link.addEventListener('click', () => {
+                        if (navLinks.classList.contains('active')) {
+                            toggleMenu();
+                        }
+                    });
+                });
+            }
+
+
+            // --- Apple Animation ---
+            const appleContainer = document.getElementById('apple-container');
+            const landingApple = document.getElementById('landing-apple');
+            const homeSection = document.getElementById('home');
+
+
+            if (landingApple) {
+
+                 landingApple.classList.add('is-floating');
+             }
+
+            if (appleContainer && landingApple && homeSection) {
+                appleContainer.addEventListener('click', () => {
+
+                    landingApple.classList.remove('is-floating');
+                    landingApple.style.animation = 'none';
+
+
+                    homeSection.classList.add('apple-dropped');
+
+
+                    setTimeout(() => {
+                        homeSection.classList.add('content-revealed');
+                    }, 150);
+
+                }, { once: true });
+            }
+
+
+            // --- Particle Generation ---
+            const particleLayer = document.getElementById('particle-layer');
+            const particleCount = 50;
+            if (particleLayer) {
+                for (let i = 0; i < particleCount; i++) {
+                    const particle = document.createElement('div');
+                    particle.classList.add('particle');
+                    const size = Math.random() * 3 + 1;
+                    particle.style.width = `${size}px`;
+                    particle.style.height = `${size}px`;
+                    particle.style.top = `${Math.random() * 100}%`;
+                    particle.style.left = `${Math.random() * 100}%`;
+
+                    particle.style.animationDelay = `${Math.random() * 20}s, ${Math.random() * 3}s`;
+                    particle.style.animationDuration = `${Math.random() * 10 + 15}s, ${Math.random() * 2 + 2}s`;
+                    particleLayer.appendChild(particle);
+                }
+            }
+
+            // --- Quotes Particle Generation ---
+            const quotesParticleLayer = document.getElementById('quotes-particle-layer');
+            const quotesParticleCount = 30;
+             if (quotesParticleLayer) {
+                 for (let i = 0; i < quotesParticleCount; i++) {
+                     const particle = document.createElement('div');
+                     particle.classList.add('particle');
+                     const size = Math.random() * 2 + 1;
+                     particle.style.width = `${size}px`;
+                     particle.style.height = `${size}px`;
+                     particle.style.top = `${Math.random() * 100}%`;
+                     particle.style.left = `${Math.random() * 100}%`;
+                     particle.style.animationDelay = `${Math.random() * 25}s, ${Math.random() * 4}s`;
+                     particle.style.animationDuration = `${Math.random() * 15 + 15}s, ${Math.random() * 2 + 3}s`;
+                     quotesParticleLayer.appendChild(particle);
+                 }
+             }
+
+            // --- Space Debris Generation ---
+            const debrisContainer = document.getElementById('space-debris-container');
+            const debrisCount = 15; // Total debris elements (will be split left/right)
+            const debrisColors = ['var(--debris-color-1)', 'var(--debris-color-2)', 'var(--debris-color-3)'];
+
+            if (debrisContainer) {
+                for (let i = 0; i < debrisCount; i++) {
+                    const debris = document.createElement('div');
+                    debris.classList.add('space-debris');
+
+                    const size = Math.random() * 25 + 5; // Size between 5px and 30px
+                    debris.style.width = `${size}px`;
+                    debris.style.height = `${size * (Math.random() * 0.5 + 0.5)}px`; // Slightly irregular height
+                    debris.style.backgroundColor = debrisColors[Math.floor(Math.random() * debrisColors.length)];
+                    debris.style.borderRadius = `${Math.random() * 40 + 10}% ${Math.random() * 40 + 10}% ${Math.random() * 40 + 10}% ${Math.random() * 40 + 10}% / ${Math.random() * 40 + 10}% ${Math.random() * 40 + 10}% ${Math.random() * 40 + 10}% ${Math.random() * 40 + 10}%`; // Random blob shape
+
+                    debris.style.top = `${Math.random() * 90}%`; // Position vertically
+
+                    // Place roughly half on each side, slightly off-screen
+                    if (i < debrisCount / 2) {
+                        debris.style.left = `-${Math.random() * 3 + 1}%`; // Slightly off left edge
+                    } else {
+                        debris.style.right = `-${Math.random() * 3 + 1}%`; // Slightly off right edge
+                         // Vary animation direction for right side
+                         debris.style.animationDirection = 'reverse';
+                    }
+
+                    const duration = Math.random() * 20 + 25; // Duration between 25s and 45s
+                    const delay = Math.random() * 20; // Delay up to 20s
+                    debris.style.animationDuration = `${duration}s`;
+                    debris.style.animationDelay = `${delay}s`;
+
+                    debrisContainer.appendChild(debris);
+                }
+            }
+
+
+            // --- Quotes Carousel Logic ---
+            const quotesContainer = document.getElementById('quotes-container');
+            const carousel = document.getElementById('quotes-carousel');
+            const prevBtn = document.getElementById('prev-quote');
+            const nextBtn = document.getElementById('next-quote');
+            let quoteInterval;
+            let quoteCards;
+
+            if (carousel) {
+                 quoteCards = carousel.querySelectorAll('.quote-card');
+            }
+
+
+             function scrollCarousel(direction) {
+                 if (!quotesContainer || !quoteCards || quoteCards.length === 0) return;
+
+                 let scrollAmount = 0;
+                 const cardWidth = quoteCards[0].offsetWidth;
+                 const gap = parseFloat(window.getComputedStyle(carousel).gap) || 30;
+
+                 // Calculate scroll amount based on visible cards (simplified for mobile)
+                 if (window.innerWidth <= 768) {
+                     scrollAmount = cardWidth + gap; // Scroll one card at a time on mobile
+                 } else {
+                     scrollAmount = cardWidth + gap; // Default scroll
+                 }
+
+
+                 quotesContainer.scrollBy({
+                     left: direction * scrollAmount,
+                     behavior: 'smooth'
+                 });
+             }
+
+
+
+            function startQuoteCarousel() {
+                 if (!quoteCards || quoteCards.length === 0) return;
+                clearInterval(quoteInterval);
+                quoteInterval = setInterval(() => {
+                     if (!quotesContainer) return;
+                     const currentScroll = quotesContainer.scrollLeft;
+                     const totalScrollWidth = quotesContainer.scrollWidth;
+                     const containerWidth = quotesContainer.clientWidth;
+
+
+                      if (currentScroll + containerWidth >= totalScrollWidth - 10) {
+
+                          quotesContainer.scrollTo({ left: 0, behavior: 'smooth' });
+                      } else {
+
+                          scrollCarousel(1);
+                      }
+
+                }, 6000);
+            }
+
+
+             function stopQuoteCarousel() {
+                 clearInterval(quoteInterval);
+             }
+
+
+             if(quotesContainer && carousel && quoteCards && quoteCards.length > 0 && nextBtn && prevBtn) {
+
+                 nextBtn.addEventListener('click', () => {
+                     stopQuoteCarousel();
+                     scrollCarousel(1);
+                     startQuoteCarousel();
+                 });
+
+
+                 prevBtn.addEventListener('click', () => {
+                     stopQuoteCarousel();
+                     scrollCarousel(-1);
+                     startQuoteCarousel();
+                 });
+
+
+                 quotesContainer.addEventListener('mouseenter', stopQuoteCarousel);
+                 quotesContainer.addEventListener('mouseleave', startQuoteCarousel);
+                 quotesContainer.addEventListener('touchstart', stopQuoteCarousel, { passive: true });
+                 quotesContainer.addEventListener('touchend', startQuoteCarousel, { passive: true });
+
+                 quotesContainer.addEventListener('wheel', stopQuoteCarousel, { passive: true });
+
+
+
+                 startQuoteCarousel();
+            }
+
+            // --- Subtopic Content Definitions ---
+            const subtopicContentMap = {
+                "P1.1.1": "Atoms consist of a tiny, dense central nucleus containing positively charged protons and neutral neutrons. This nucleus holds almost all the atom's mass. Orbiting the nucleus in specific energy levels (or shells) are negatively charged electrons, which are much lighter. The majority of an atom's volume is empty space, highlighting the incredibly small scale of atomic components.",
+                "P1.1.2": "The Atomic Number (Z), unique to each element, represents the number of protons in the nucleus. In a neutral atom, this also equals the number of electrons. The Mass Number (A) is the sum of protons and neutrons (A = Z + N). Isotopes are variants of the same element; they have the same number of protons (same Z) but differ in their neutron count (N), leading to different mass numbers (A).",
+                "P1.2.1": "Density (symbol ρ) is a fundamental property describing how compact a substance is. It's defined as mass (m) per unit volume (V), calculated using the formula ρ = m/V. High density means particles are tightly packed, while low density means they are more spread out. Common units include kilograms per cubic meter (kg/m³) or grams per cubic centimeter (g/cm³).",
+                "P1.2.2": "Temperature is a measure of the average kinetic energy (energy of motion) of the particles within a substance. Adding heat increases the internal energy, making particles move faster (increasing kinetic energy) and potentially further apart (increasing potential energy). During phase changes (like melting or boiling), the added energy is used to overcome intermolecular forces and change the particle arrangement, so the temperature remains constant despite energy input.",
+                "P1.2.3": "Specific Heat Capacity (c) quantifies the amount of thermal energy (heat) needed to raise the temperature of one kilogram (1 kg) of a specific substance by one degree Celsius (1°C) or one Kelvin (1 K). Materials with high specific heat capacity (like water) require more energy to heat up and cool down slowly. The energy change (ΔE) is calculated using ΔE = m × c × Δθ, where m is mass and Δθ is the temperature change.",
+                "P1.2.4": "Specific Latent Heat (L) is the amount of energy absorbed or released per kilogram (1 kg) of a substance during a change of state (phase change) at a constant temperature. Specific Latent Heat of Fusion (L<0xE2><0x82><0x9F>) relates to melting/freezing, while Specific Latent Heat of Vaporization (L<0xE1><0xB5><0xA6>) relates to boiling/condensing. The energy (E) involved is calculated using E = m × L.",
+                "P1.2.5": "For a fixed mass of gas held at a constant volume, increasing the temperature boosts the average kinetic energy and speed of the gas particles. These faster-moving particles collide more frequently and more forcefully with the container walls, resulting in an increase in gas pressure. Pressure is directly proportional to the absolute temperature (measured in Kelvin).",
+
+                "P2.1.1": "Distance is a scalar quantity representing the total length covered along a path, regardless of direction. Speed is the rate at which distance is covered, also a scalar, calculated as Speed = Distance / Time. Its units are typically meters per second (m/s).",
+                "P2.1.2": "Scalars are physical quantities fully described by their magnitude (size) alone, such as distance, speed, mass, time, temperature, and energy. Vectors require both magnitude and direction for a complete description; examples include displacement, velocity, acceleration, force, and momentum.",
+                "P2.1.3": "Acceleration (a) is the rate of change of velocity over time. It's a vector quantity, indicating how quickly an object's speed or direction (or both) is changing. Calculated as a = (v - u) / t, where v is final velocity, u is initial velocity, and t is time. Its unit is meters per second squared (m/s²). Negative acceleration is often called deceleration.",
+                "P2.1.4": "A distance-time graph plots an object's distance from a starting point against time. The gradient (slope) of the line represents the object's speed. A horizontal line means the object is stationary (speed = 0). A straight, diagonal line indicates constant speed. A steeper slope signifies a higher speed. A curved line shows changing speed (acceleration or deceleration).",
+                "P2.1.5": "A velocity-time graph shows an object's velocity against time. The gradient (slope) represents acceleration (positive slope for acceleration, negative for deceleration, zero for constant velocity). A horizontal line indicates constant velocity. The area under the graph represents the object's displacement (change in position).",
+                "P2.1.6": "For constant acceleration, 'SUVAT' equations link displacement (s), initial velocity (u), final velocity (v), acceleration (a), and time (t). Key examples: v = u + at, s = ut + ½at², v² = u² + 2as. Kinetic energy (KE) is the energy of motion, calculated as KE = ½mv², where m is mass and v is velocity.",
+                "P2.1 Summary": "This section summarizes key concepts in motion: defining distance, displacement, speed, velocity, and acceleration (scalar vs. vector). It covers interpreting distance-time and velocity-time graphs, including calculating speed from gradients and displacement from areas.",
+                "P2.1 Revision": "Focuses on applying the equations of motion (SUVAT) for constant acceleration scenarios and calculating kinetic energy. Includes practice problems involving graph analysis and formula application.",
+
+                "P2.2.1": "Forces are interactions between objects resulting in a push or pull. They are vector quantities, possessing both magnitude (measured in Newtons, N) and direction. Forces can change an object's state of motion (start/stop moving, speed up/slow down, change direction) or deform its shape.",
+                "P2.2.2": "A free body diagram simplifies a physical situation by representing a single object as a point or box and drawing arrows outward from it to show *only* the forces acting *on* that object. Each arrow's length and direction indicate the force's magnitude and direction, helping visualize the net force.",
+                "P2.2.3": "Newton's First Law (Law of Inertia): An object remains at rest or continues in a state of uniform motion (constant velocity) unless acted upon by a resultant (net) external force. Essentially, objects resist changes in their motion; balanced forces result in no acceleration.",
+                "P2.2.4": "Newton's Second Law: The acceleration of an object is directly proportional to the net force acting on it and inversely proportional to its mass (a ∝ F_net / m). The standard form is F_net = m × a. The acceleration produced is always in the same direction as the net force.",
+                "P2.2.5": "Everyday forces include: Weight (gravitational pull, mg), Friction (opposes motion between surfaces), Air Resistance/Drag (opposes motion through fluids), Tension (pull in ropes/strings), Normal Reaction (support force perpendicular to a surface), Upthrust (buoyancy in fluids). Understanding these helps analyze real-world scenarios.",
+                "P2.2.6": "Momentum (p) is a measure of an object's 'quantity of motion', calculated as mass (m) times velocity (v): p = mv. It is a vector quantity (kg m/s). The Principle of Conservation of Momentum states that in the absence of external forces, the total momentum of a system remains constant before and after interactions like collisions or explosions.",
+                "P2.2.7": "Work (W) is done when a force (F) causes displacement (s) in the direction of the force. Calculated as W = F × s, its unit is the Joule (J). Power (P) is the rate at which work is done or energy is transferred, calculated as P = W / t or P = E / t. Its unit is the Watt (W).",
+                "P2.2 Summary": "Consolidates understanding of forces as interactions, the use of free body diagrams, Newton's three laws of motion, the concept and conservation of momentum, and the definitions and calculations of work done and power.",
+                "P2.2 Revision": "Provides practice problems applying Newton's laws (F=ma), calculating momentum changes, impulse (Ft = Δ(mv)), work done by forces, and power output in various physical contexts.",
+
+                "P3.1.1": "Electrostatics deals with stationary electric charges. Objects can become charged by gaining or losing electrons (e.g., through friction). Like charges (positive-positive or negative-negative) exert repulsive forces on each other, while opposite charges (positive-negative) exert attractive forces.",
+                "P3.1.2": "Electric current (I) is the rate of flow of electric charge (Q) past a point in a circuit, defined as I = Q / t. The unit of current is the Ampere (A). In metals, current consists of moving electrons. Conventional current direction is defined as the flow of positive charge (opposite to electron flow).",
+                "P3.2.1": "A basic circuit needs a source of potential difference (voltage, V), like a battery, which provides the 'push' or energy per unit charge (V = E/Q), and a complete conducting path (closed loop) for charge to flow. Potential difference is measured in Volts (V).",
+                "P3.2.2": "In a series circuit, components form a single loop. Current is the same everywhere. Voltage from the source is shared across components (V_total = V₁ + V₂ + ...). In a parallel circuit, components are on separate branches. Voltage across each branch is the same as the source. Total current splits between branches (I_total = I₁ + I₂ + ...).",
+                "P3.2.3": "Resistance (R) is the opposition to current flow in a component. Defined by Ohm's Law: R = V / I (Resistance = Voltage / Current). Measured in Ohms (Ω). Higher resistance means less current flows for a given voltage.",
+                "P3.2.4": "For an Ohmic resistor (constant temperature), the V-I graph is a straight line through the origin (V ∝ I). For a filament lamp, the graph curves because resistance increases as the filament heats up. A diode's graph shows very high resistance in reverse bias and low resistance above a certain voltage in forward bias.",
+                "P3.2.5": "An LDR (Light-Dependent Resistor) is a semiconductor whose resistance *decreases* as light intensity increases. A thermistor (typically NTC - Negative Temperature Coefficient) is a resistor whose resistance *decreases* as temperature increases.",
+                "P3.2.6": "Total resistance in series: R_total = R₁ + R₂ + ... (simply adds up). Total resistance in parallel: 1/R_total = 1/R₁ + 1/R₂ + ... (sum of reciprocals). Note that R_total in parallel is always less than the smallest individual resistance. These rules are used with Ohm's Law (V=IR) to analyze circuits.",
+                "P3.2.7": "Sensing circuits use components like LDRs or thermistors within a potential divider arrangement. As the resistance of the sensor changes due to environmental factors (light/temp), the voltage across it (and other components in the divider) changes. This voltage change can be used to switch other circuits on or off.",
+                "P3.2.8": "Electrical power (P) is the rate at which energy (E) is transferred by an electrical circuit. It's calculated using P = I × V (Power = Current × Voltage). Using Ohm's law, it can also be expressed as P = I² × R or P = V² / R. The unit of power is the Watt (W). Energy transferred is E = P × t.",
+                "P3.3.1": "Magnets produce a magnetic field, a region where magnetic materials or moving charges experience a force. Magnetic field lines map the field, pointing from North (N) pole to South (S) pole outside the magnet. The density of lines indicates field strength. Like poles repel, unlike poles attract.",
+                "P3.3.2": "When an electric current flows through a wire, it creates a circular magnetic field around the wire. The direction of the field lines can be found using the Right-Hand Grip Rule: grip the wire with your right hand, thumb pointing in the direction of the conventional current; your fingers curl in the direction of the magnetic field.",
+                "P3.3.3": "The Motor Effect: A wire carrying an electric current placed within an external magnetic field experiences a force. This force is maximum when the current and magnetic field are perpendicular and zero when they are parallel. The force is always perpendicular to both the current direction and the magnetic field direction.",
+                "P3.3.4": "Electric motors work because of the motor effect. A coil of wire carrying current is placed in a magnetic field. The forces on opposite sides of the coil create a turning effect (torque). A split-ring commutator reverses the current direction in the coil every half-turn, ensuring the coil keeps rotating continuously in the same direction. Fleming's Left-Hand Rule predicts the force direction."
+            };
+
+
+
+            // --- Solar System / Progress Tracker Logic ---
+            const planets = document.querySelectorAll('.planet');
+            const planetInfoBox = document.getElementById('planet-info');
+            const planetInfoTitle = document.getElementById('planet-info-title');
+            const planetInfoMessage = document.getElementById('planet-info-message');
+            const subtopicsContainer = document.getElementById('planet-info-subtopics');
+            const closeInfoBtn = document.getElementById('close-info-btn');
+            const markCompleteBtn = document.getElementById('mark-complete-btn');
+            const planetOverlay = document.getElementById('overlay'); // Renamed for clarity
+            let currentPlanet = null;
+
+            // --- Subtopic Content Box Elements ---
+            const subtopicOverlay = document.getElementById('subtopic-content-overlay');
+            const subtopicBox = document.getElementById('subtopic-content-box');
+            const subtopicBoxContent = document.getElementById('subtopic-box-content');
+            const subtopicBoxTitle = document.getElementById('subtopic-box-title'); // Get title element
+            const subtopicBoxSummary = document.getElementById('subtopic-box-summary'); // Get summary p element
+            const closeSubtopicBoxBtn = document.getElementById('close-subtopic-box');
+
+            // --- Function to show content for a SPECIFIC subtopic ---
+            function showSubtopicContent(subtopicId, subtopicText) {
+                // Check if elements exist
+                if (!subtopicOverlay || !subtopicBox || !subtopicBoxContent || !subtopicBoxTitle || !subtopicBoxSummary) return;
+
+                // Get the summary from the map or use a default
+                const summary = subtopicContentMap[subtopicId] || "Content summary for this topic is not available yet.";
+
+                // Set the title and summary content for the specific subtopic
+                subtopicBoxTitle.textContent = subtopicText || "Subtopic Details"; // Use link text as title
+                subtopicBoxSummary.textContent = summary; // Set the fetched or default summary
+
+                // Make the overlay and box visible
+                subtopicOverlay.classList.add('visible');
+                subtopicBox.classList.add('visible');
+                 // Scroll content box to top
+                 subtopicBoxContent.scrollTop = 0;
+
+                // Optionally: Prevent body scroll when subtopic box is open
+                // body.style.overflow = 'hidden';
+            }
+
+            // --- Function to hide the content box ---
+            function hideSubtopicContent() {
+                 // Check if elements exist
+                if (!subtopicOverlay || !subtopicBox) return;
+
+                subtopicOverlay.classList.remove('visible');
+                subtopicBox.classList.remove('visible');
+                // Restore body scroll if it was prevented
+                // body.style.overflow = '';
+            }
+
+             // Add event listeners to close the subtopic box
+             if (closeSubtopicBoxBtn) {
+                closeSubtopicBoxBtn.addEventListener('click', hideSubtopicContent);
+             }
+             if (subtopicOverlay) {
+                 subtopicOverlay.addEventListener('click', hideSubtopicContent);
+             }
+
+
+            function loadPlanetStatus() {
+                planets.forEach(planet => {
+                    const topic = planet.dataset.topic;
+                    if (topic && localStorage.getItem(`planet_${topic}_completed`) === 'true') {
+                        planet.classList.add('completed');
+                    }
+                });
+            }
+
+            if (planets.length > 0 && planetInfoBox && closeInfoBtn && markCompleteBtn && planetOverlay) {
+                planets.forEach(planet => {
+                    planet.addEventListener('click', () => {
+                        currentPlanet = planet;
+                        const topic = planet.dataset.topic;
+                        const message = planet.dataset.message;
+                        const subtopicsData = planet.dataset.subtopics;
+                        let subtopics = {};
+
+                        try {
+                            if (subtopicsData) {
+                                subtopics = JSON.parse(subtopicsData);
+                            }
+                        } catch (e) {
+                            console.error("Error parsing planet subtopics JSON:", e, "\nRaw data:", subtopicsData);
+                            subtopics = {};
+                        }
+
+                        if (planetInfoTitle) planetInfoTitle.textContent = topic || "Topic Info";
+                        if (planetInfoMessage) planetInfoMessage.textContent = message || "No details available.";
+
+                        // --- Populate Subtopics ---
+                        if (subtopicsContainer) {
+                            subtopicsContainer.innerHTML = '';
+                            let contentAdded = false;
+
+                            if (subtopics && typeof subtopics === 'object' && Object.keys(subtopics).length > 0) {
+                                for (const sectionTitle in subtopics) {
+                                    if (subtopics.hasOwnProperty(sectionTitle)) {
+                                        const items = subtopics[sectionTitle];
+
+                                        if (items && typeof items === 'object' && Object.keys(items).length > 0) {
+                                            contentAdded = true;
+                                            const sectionDiv = document.createElement('div');
+                                            const titleElement = document.createElement('h4');
+                                            titleElement.textContent = sectionTitle;
+                                            sectionDiv.appendChild(titleElement);
+
+                                            const listElement = document.createElement('ul');
+                                            for (const itemCode in items) {
+                                                 if (items.hasOwnProperty(itemCode)) {
+                                                    const itemText = items[itemCode];
+                                                    const listItem = document.createElement('li');
+                                                    const link = document.createElement('a');
+                                                    link.href = "#"; // Use # instead of XYZ for consistency
+                                                    link.textContent = `${itemCode} ${itemText}`;
+                                                    // Store the unique ID and text on the link itself
+                                                    link.dataset.subtopicId = itemCode;
+                                                    link.dataset.subtopicText = `${itemCode} ${itemText}`;
+
+                                                    // --- Updated click listener ---
+                                                    link.addEventListener('click', (e) => {
+                                                        e.preventDefault(); // Prevent default link behavior
+                                                        const id = e.target.dataset.subtopicId;
+                                                        const text = e.target.dataset.subtopicText;
+                                                        showSubtopicContent(id, text); // Show the specific content box
+                                                    });
+                                                    // --- End updated click listener ---
+
+                                                    listItem.appendChild(link);
+                                                    listElement.appendChild(listItem);
+                                                }
+                                            }
+                                            sectionDiv.appendChild(listElement);
+                                            subtopicsContainer.appendChild(sectionDiv);
+                                        }
+                                    }
+                                }
+                            }
+
+                            if (!contentAdded) {
+                                 const fallbackSpan = document.createElement('span');
+                                 fallbackSpan.textContent = 'No sub-topics available yet.';
+                                 fallbackSpan.style.padding = '10px';
+                                 fallbackSpan.style.display = 'block';
+                                 fallbackSpan.style.textAlign = 'center';
+                                 fallbackSpan.style.color = 'var(--accent-gray)';
+                                 subtopicsContainer.appendChild(fallbackSpan);
+                                 console.warn("No valid subtopics found or processed for planet:", topic);
+                            }
+                        }
+                        // --- End Populate Subtopics ---
+
+                        if (markCompleteBtn) {
+                            if (planet.classList.contains('completed')) {
+                                markCompleteBtn.textContent = "Mark as Incomplete";
+                                markCompleteBtn.style.opacity = 0.7;
+                            } else {
+                                markCompleteBtn.textContent = "Mark as Complete ✨";
+                                markCompleteBtn.style.opacity = 1;
+                            }
+                        }
+
+                        planetInfoBox.style.display = 'block';
+                        planetOverlay.style.display = 'block';
+                        body.style.overflow = 'hidden'; // Prevent body scroll when planet info is open
+                    });
+                });
+
+
+                closeInfoBtn.addEventListener('click', () => {
+                    planetInfoBox.style.display = 'none';
+                    planetOverlay.style.display = 'none';
+                    body.style.overflow = ''; // Restore body scroll
+                    currentPlanet = null;
+                    hideSubtopicContent(); // Also hide subtopic box if it's open when closing the planet info
+                });
+
+
+                planetOverlay.addEventListener('click', () => {
+                     closeInfoBtn.click(); // Close planet info (which also closes subtopic box)
+                });
+
+
+                markCompleteBtn.addEventListener('click', () => {
+                    if (currentPlanet) {
+                        const topic = currentPlanet.dataset.topic;
+                        if (topic) {
+
+                            const isCompleted = currentPlanet.classList.toggle('completed');
+
+                            if(isCompleted){
+                                localStorage.setItem(`planet_${topic}_completed`, 'true');
+                                markCompleteBtn.textContent = "Mark as Incomplete";
+                                markCompleteBtn.style.opacity = 0.7;
+                            } else {
+                                 localStorage.removeItem(`planet_${topic}_completed`);
+                                 markCompleteBtn.textContent = "Mark as Complete ✨";
+                                 markCompleteBtn.style.opacity = 1;
+                            }
+                        }
+                    }
+                });
+
+
+                loadPlanetStatus();
+            }
+
+
+
+            // --- Floating Formulae ---
+            const formulaeContainer = document.getElementById('floating-formulae-container');
+            const formulae = ['F=ma', 'E=mc²', 'v = u + at', 'λ = h/p', 'PV=nRT', 'W=Vq', 'P=IV', 'ρ = m/V', 'KE = ½mv²', 'GPE = mgh', 'ω = v/r', 'τ = Iα'];
+            const sections = document.querySelectorAll('section');
+
+            if (formulaeContainer && sections.length > 0) {
+                 sections.forEach(section => {
+                    if(section.id === 'home') return;
+
+
+                     for (let i = 0; i < 3; i++) {
+                         const formulaElement = document.createElement('span');
+                         formulaElement.classList.add('floating-element');
+                         formulaElement.textContent = formulae[Math.floor(Math.random() * formulae.length)];
+
+
+                         const sectionRect = section.getBoundingClientRect();
+
+
+                         formulaElement.style.position = 'absolute';
+
+                         // Adjust positioning relative to body scroll, not just section offset
+                         const scrollY = window.pageYOffset || document.documentElement.scrollTop;
+                         const topPos = Math.random() * sectionRect.height + section.offsetTop;
+
+                         formulaElement.style.top = `${topPos}px`;
+                         formulaElement.style.left = `${Math.random() * 80 + 10}%`;
+                         formulaElement.style.fontSize = `${Math.random() * 0.8 + 0.8}rem`;
+
+                         formulaElement.style.animationDelay = `${Math.random() * 10}s`;
+                         formulaElement.style.animationDuration = `${Math.random() * 20 + 20}s`;
+
+
+                         document.body.appendChild(formulaElement);
+
+
+                         setTimeout(() => {
+                            formulaElement.style.opacity = '0.15';
+                            formulaElement.style.transition = 'opacity 2s ease-in';
+                         }, Math.random() * 3000 + 500);
+                    }
+                 });
+            }
+
+             // --- Flashcard Logic ---
+            const flashcardContainer = document.getElementById('flashcard-container');
+            const randomizeBtn = document.getElementById('randomize-flashcards');
+
+            function setupFlashcards() {
+                 if (!flashcardContainer) return; // Guard clause
+                 const flashcards = flashcardContainer.querySelectorAll('.flashcard');
+                 flashcards.forEach(card => {
+                     card.addEventListener('click', () => {
+                         card.classList.toggle('show-answer'); // Use simple toggle class
+                     });
+                 });
+             }
+
+            // Fisher-Yates (Knuth) Shuffle function
+            function shuffleArray(array) {
+                let currentIndex = array.length, randomIndex;
+                while (currentIndex !== 0) {
+                    randomIndex = Math.floor(Math.random() * currentIndex);
+                    currentIndex--;
+                    [array[currentIndex], array[randomIndex]] = [
+                        array[randomIndex], array[currentIndex]];
+                }
+                return array;
+            }
+
+            function randomizeCards() {
+                 if (!flashcardContainer) return; // Guard clause
+                 const topicGroups = flashcardContainer.querySelectorAll('.flashcard-topic-group');
+                 topicGroups.forEach(group => {
+                     const grid = group.querySelector('.flashcard-grid'); // Get the grid within the group
+                     if (!grid) return; // Skip if no grid found
+                     const cardsInGroup = Array.from(grid.querySelectorAll('.flashcard'));
+                     // Ensure cards are not flipped before shuffling
+                     cardsInGroup.forEach(card => card.classList.remove('show-answer'));
+                     const shuffledCards = shuffleArray(cardsInGroup);
+
+                     // Clear existing cards in the grid
+                     grid.innerHTML = '';
+                     // Re-append shuffled cards to the grid
+                     shuffledCards.forEach(card => grid.appendChild(card));
+                 });
+            }
+
+            if (flashcardContainer) {
+                setupFlashcards(); // Initial setup
+            }
+
+            if (randomizeBtn && flashcardContainer) {
+                 randomizeBtn.addEventListener('click', randomizeCards);
+            }
+            // --- End Flashcard Logic ---
+
+            // --- Reveal on Scroll Logic ---
+            const revealElements = document.querySelectorAll('.revealable, .planet, .flashcard, .quote-card'); // Add classes/elements to reveal
+
+            const revealObserver = new IntersectionObserver((entries, observer) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.classList.add('visible');
+                        // Optional: Stop observing after reveal to save resources
+                        // observer.unobserve(entry.target);
+                    }
+                    // Optional: If you want elements to fade out when scrolling back up
+                    // else {
+                    //     entry.target.classList.remove('visible');
+                    // }
+                });
+            }, {
+                threshold: 0.1 // Trigger when 10% of the element is visible
+                // rootMargin: '0px 0px -50px 0px' // Optional: Adjust trigger margin
+            });
+
+            revealElements.forEach(el => {
+                 revealObserver.observe(el);
+            });
+            // --- End Reveal on Scroll Logic ---
+
+
+            // --- Final Boost Name Placeholder ---
+            // const namePlaceholder = document.querySelector('#final-boost .boost-message h3');
+            // if (namePlaceholder && namePlaceholder.innerHTML.includes('[Your Name Here]')) {
+                 // console.log("Note: Replace '[Your Name Here]' in the final boost section.");
+                 // namePlaceholder.innerHTML = namePlaceholder.innerHTML.replace('[Your Name Here]', 'Aliyah'); // Example replacement
+            // }
+
+
+        });
+    </script>
+
+</body>
+</html>
