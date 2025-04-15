@@ -8,6 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Anton&family=Audiowide&family=Orbitron:wght@400..900&family=Russo+One&family=Space+Grotesk:wght@300..700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400..700&display=swap" rel="stylesheet"> <!-- Added Caveat for handwritten style -->
     <style>
         :root {
             --bg-color: #000000;
@@ -20,6 +21,10 @@
             --debris-color-1: #a0a0a0;
             --debris-color-2: #707070;
             --debris-color-3: #505050;
+            --love-color-1: #ff4d6d; /* Pink */
+            --love-color-2: #ff758f; /* Lighter Pink */
+            --love-color-3: #ff8fa3; /* Even Lighter Pink */
+            --love-color-4: #ffb3c1; /* Soft Pink */
         }
 
         * {
@@ -551,8 +556,8 @@
         }
         .solar-system {
             position: relative;
-            width: 750px; /* Slightly Increased size */
-            height: 750px; /* Slightly Increased size */
+            width: 900px; /* Increased size to accommodate 4th orbit */
+            height: 900px; /* Increased size to accommodate 4th orbit */
             margin: 50px auto;
         }
 
@@ -594,7 +599,7 @@
             height: 60px; /* Increased size slightly */
             border-radius: 50%;
             cursor: pointer;
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.6s ease-out 0.3s; /* Added opacity/transform transition */
             display: flex;
             align-items: center;
             justify-content: center;
@@ -608,10 +613,10 @@
             font-weight: 700;
              /* Reveal on scroll */
              opacity: 0;
-             transform: scale(0.8);
-             transition: opacity 0.6s ease-out 0.3s, transform 0.6s ease-out 0.3s;
+             transform: scale(0.8); /* Start scaled down for reveal */
+             /* Transition handled above */
         }
-         .planet.visible {
+         .planet.visible { /* Class added by reveal observer */
              opacity: 1;
              transform: scale(1);
          }
@@ -657,7 +662,30 @@
              animation-iteration-count: infinite;
         }
 
-        /* Removed orbit4 and planet4 styles */
+        /* --- Styles for Planet 4 --- */
+        .orbit4 { width: 900px; height: 900px; } /* New outer orbit */
+        .planet4 {
+            background: linear-gradient(45deg, #ff758f, #ffb3c1); /* Pink gradient */
+            color: #5f0f40; /* Dark pink text */
+            animation-name: orbit4-anim;
+            animation-duration: 55s; /* Slower outer orbit */
+            animation-timing-function: linear;
+            animation-iteration-count: infinite;
+            /* Initially hidden */
+            opacity: 0;
+            transform: scale(0);
+            pointer-events: none;
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out; /* Smooth appearance */
+        }
+        .planet4.visible { /* Class to show the planet */
+            opacity: 1;
+            transform: scale(1);
+            pointer-events: all;
+        }
+        .planet4:hover {
+             box-shadow: 0 0 25px var(--love-color-1), 0 0 40px var(--love-color-2);
+        }
+        /* --- End Planet 4 Styles --- */
 
         @keyframes orbit1-anim {
              from { transform: rotate(0deg) translateX(140px) rotate(0deg) translate(-30px, -30px); } /* Updated translateX */
@@ -671,7 +699,11 @@
              from { transform: rotate(0deg) translateX(360px) rotate(0deg) translate(-30px, -30px); } /* Updated translateX */
              to   { transform: rotate(360deg) translateX(360px) rotate(-360deg) translate(-30px, -30px); } /* Updated translateX */
          }
-         /* Removed orbit4-anim */
+        /* New animation for planet 4 */
+        @keyframes orbit4-anim {
+             from { transform: rotate(0deg) translateX(450px) rotate(0deg) translate(-30px, -30px); } /* Updated translateX */
+             to   { transform: rotate(360deg) translateX(450px) rotate(-360deg) translate(-30px, -30px); } /* Updated translateX */
+         }
 
 
         .planet-info {
@@ -1123,7 +1155,7 @@
             .carousel-arrow.prev { left: -10px; }
             .carousel-arrow.next { right: -10px; }
 
-            .solar-system { width: 550px; height: 550px; } /* Adjusted size */
+            .solar-system { width: 650px; height: 650px; } /* Adjusted size */
             .sun { width: 65px; height: 65px; font-size: 0.7rem;}
             .planet { width: 50px; height: 50px; font-size: 0.7rem;} /* Adjusted */
 
@@ -1138,6 +1170,11 @@
             .orbit3 { width: 540px; height: 540px; } /* Adjusted */
             @keyframes orbit3-anim-1024 { from { transform: rotate(0deg) translateX(270px) rotate(0deg) translate(-25px, -25px); } to { transform: rotate(360deg) translateX(270px) rotate(-360deg) translate(-25px, -25px); } } /* Adjusted */
             .planet3 { animation-name: orbit3-anim-1024; }
+
+            .orbit4 { width: 650px; height: 650px; } /* Adjusted */
+            @keyframes orbit4-anim-1024 { from { transform: rotate(0deg) translateX(325px) rotate(0deg) translate(-25px, -25px); } to { transform: rotate(360deg) translateX(325px) rotate(-360deg) translate(-25px, -25px); } } /* Adjusted */
+            .planet4 { animation-name: orbit4-anim-1024; } /* Apply responsive animation */
+
 
             #final-boost .boost-message h3 { font-size: 2rem; } /* Orbitron */
             #final-boost .personal-message { font-size: 1.1rem; }
@@ -1209,7 +1246,7 @@
              .carousel-arrow.prev { left: 5px; }
              .carousel-arrow.next { right: 5px; }
 
-             .solar-system { width: 320px; height: 320px; } /* Adjusted size */
+             .solar-system { width: 400px; height: 400px; } /* Adjusted size */
              .sun { width: 55px; height: 55px; font-size: 0.6rem;}
              .planet { width: 40px; height: 40px; font-size: 0.6rem;} /* Adjusted */
 
@@ -1224,6 +1261,10 @@
              .orbit3 { width: 310px; height: 310px; } /* Adjusted */
               @keyframes orbit3-anim-768 { from { transform: rotate(0deg) translateX(155px) rotate(0deg) translate(-20px, -20px); } to { transform: rotate(360deg) translateX(155px) rotate(-360deg) translate(-20px, -20px); } } /* Adjusted */
               .planet3 { animation-name: orbit3-anim-768; }
+
+            .orbit4 { width: 400px; height: 400px; } /* Adjusted */
+             @keyframes orbit4-anim-768 { from { transform: rotate(0deg) translateX(200px) rotate(0deg) translate(-20px, -20px); } to { transform: rotate(360deg) translateX(200px) rotate(-360deg) translate(-20px, -20px); } } /* Adjusted */
+             .planet4 { animation-name: orbit4-anim-768; } /* Apply responsive animation */
 
 
              .planet-info { width: 90%; padding: 25px; max-width: 90%; } /* Adjusted padding/width */
@@ -1273,7 +1314,7 @@
              .carousel-arrow.prev { left: 2px; }
              .carousel-arrow.next { right: 2px; }
 
-             .solar-system { width: 280px; height: 280px; } /* Adjusted size */
+             .solar-system { width: 340px; height: 340px; } /* Adjusted size */
              .sun { width: 45px; height: 45px; font-size: 0.5rem;}
              .planet { width: 35px; height: 35px; font-size: 0.55rem; } /* Adjusted */
 
@@ -1288,6 +1329,10 @@
              .orbit3 { width: 270px; height: 270px; } /* Adjusted */
              @keyframes orbit3-anim-480 { from { transform: rotate(0deg) translateX(135px) rotate(0deg) translate(-17.5px, -17.5px); } to { transform: rotate(360deg) translateX(135px) rotate(-360deg) translate(-17.5px, -17.5px); } } /* Adjusted */
              .planet3 { animation-name: orbit3-anim-480; }
+
+             .orbit4 { width: 340px; height: 340px; } /* Adjusted */
+             @keyframes orbit4-anim-480 { from { transform: rotate(0deg) translateX(170px) rotate(0deg) translate(-17.5px, -17.5px); } to { transform: rotate(360deg) translateX(170px) rotate(-360deg) translate(-17.5px, -17.5px); } } /* Adjusted */
+             .planet4 { animation-name: orbit4-anim-480; } /* Apply responsive animation */
 
              #final-boost .boost-message h3 { font-size: 1.5rem; } /* Orbitron */
              #final-boost .personal-message { font-size: 0.9rem; }
@@ -1404,6 +1449,126 @@
         }
         /* --- End Subtopic Content Box Styles --- */
 
+        /* --- Cat Modal Styles --- */
+        #cat-modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.8); /* Darker overlay */
+            z-index: 1900; /* Below love particles, above other modals */
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease-in-out;
+        }
+        #cat-modal-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        #cat-modal {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) scale(0.8); /* Start smaller */
+            background: radial-gradient(circle, rgba(255, 182, 193, 0.2), rgba(255, 117, 143, 0.1)); /* Subtle pink gradient */
+            border: 1px solid var(--love-color-2);
+            border-radius: 20px;
+            padding: 30px;
+            width: 90%;
+            max-width: 450px; /* Appropriate size for image/message */
+            z-index: 1910; /* Above overlay */
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 30px var(--love-color-1) inset;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease-in-out, transform 0.5s cubic-bezier(0.68, -0.55, 0.27, 1.55), visibility 0.5s; /* Elastic scale transition */
+            text-align: center;
+            color: var(--text-color);
+        }
+        #cat-modal.visible {
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, -50%) scale(1);
+        }
+
+        #cat-modal img#cat-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border: 3px solid rgba(255, 255, 255, 0.5); /* White border */
+        }
+
+        #cat-modal p#cat-message {
+            font-family: 'Caveat', cursive; /* Handwritten font */
+            font-size: 1.6rem; /* Larger handwritten text */
+            color: var(--love-color-4); /* Soft pink text */
+            margin-bottom: 25px;
+            line-height: 1.5;
+            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.5);
+        }
+
+        #cat-modal .close-cat-modal-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            color: var(--text-color);
+            padding: 8px 18px;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: background 0.3s ease, transform 0.2s ease;
+            font-family: 'Poppins', sans-serif;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        #cat-modal .close-cat-modal-btn:hover {
+             background: rgba(255, 255, 255, 0.4);
+             transform: scale(1.05);
+        }
+        /* --- End Cat Modal Styles --- */
+
+
+        /* --- Love Particle Styles --- */
+        #love-particles-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2000; /* Highest layer */
+            overflow: hidden;
+        }
+
+        .love-particle {
+            position: absolute;
+            bottom: -50px; /* Start below screen */
+            font-size: 1.5rem; /* Base size */
+            opacity: 0;
+            animation: floatUpPop 3s ease-out forwards; /* Animation name, duration, timing, fill-mode */
+            user-select: none; /* Prevent text selection */
+        }
+
+        @keyframes floatUpPop {
+            0% {
+                transform: translateY(0) rotate(0deg) scale(0.5);
+                opacity: 0;
+            }
+            20% {
+                 transform: translateY(-20vh) rotate(-15deg) scale(1);
+                 opacity: 1;
+            }
+            80% {
+                transform: translateY(-80vh) rotate(15deg) scale(1.2);
+                opacity: 1;
+            }
+            100% {
+                 transform: translateY(-100vh) rotate(30deg) scale(0.8);
+                 opacity: 0;
+            }
+        }
+        /* --- End Love Particle Styles --- */
+
 
     </style>
 </head>
@@ -1443,7 +1608,7 @@
          </div>
          <div class="landing-content">
             <h1>Gravity attracted the apple.<br>You attracted me lilbae 😈 HEY!</h1>
-            <p>Your journey through the cosmos of physics starts now.</p>
+            <p>ZAA PHSYOCKS LOCKEN IN</p>
             <a href="#quotes" class="cta-button">STARTEN ZA LOCKEN</a>
         </div>
     </section>
@@ -1488,7 +1653,7 @@
         <div class="solar-system" id="solar-system">
              <div class="sun">Year 11<br>Physics</div>
              <div class="orbit orbit1"></div>
-             <div class="planet planet1"
+             <div class="planet planet1" id="planet1"
                   data-topic="P1 Matter"
                   data-message="Exploring the fundamental building blocks and states of matter."
                   data-subtopics='{"P1.1 The particle model": {"P1.1.1": "The model of the atom 1", "P1.1.2": "The model of the atom 2"}, "P1.2 Changes of state": {"P1.2.1": "Density", "P1.2.2": "Energy and temperature", "P1.2.3": "Specific heat capacity", "P1.2.4": "Specific latent heat", "P1.2.5": "Gas pressure and temperature"}}'>
@@ -1496,7 +1661,7 @@
              </div>
 
              <div class="orbit orbit2"></div>
-             <div class="planet planet2"
+             <div class="planet planet2" id="planet2"
                   data-topic="P2 Forces"
                   data-message="Understanding motion, interactions, and Newton's laws."
                   data-subtopics='{"P2.1 Motion": {"P2.1.1": "Distance, time, and speed", "P2.1.2": "Vectors and scalars", "P2.1.3": "Acceleration", "P2.1.4": "Distance–time graphs", "P2.1.5": "Velocity–time graphs", "P2.1.6": "Equations of motion and kinetic energy", "P2.1 Summary": "Summary questions", "P2.1 Revision": "Revision questions"}, "P2.2 Newton’s Laws": {"P2.2.1": "Forces and interactions", "P2.2.2": "Free body diagrams", "P2.2.3": "Newton’s First Law", "P2.2.4": "Newton’s Second Law", "P2.2.5": "Everyday forces and their effects", "P2.2.6": "Momentum", "P2.2.7": "Work and power", "P2.2 Summary": "Summary questions", "P2.2 Revision": "Revision questions"}}'>
@@ -1504,14 +1669,18 @@
             </div>
 
              <div class="orbit orbit3"></div>
-             <div class="planet planet3"
+             <div class="planet planet3" id="planet3"
                   data-topic="P3 Electricity & Magnetism"
                   data-message="Delving into charges, circuits, fields, and their applications."
                   data-subtopics='{"P3.1 Static and charge": {"P3.1.1": "Electrostatics", "P3.1.2": "Electric current"}, "P3.2 Simple circuits": {"P3.2.1": "Circuits and potential difference", "P3.2.2": "Series and parallel circuits", "P3.2.3": "Resistance", "P3.2.4": "Graphs of p.d. and current", "P3.2.5": "LDRs and thermistors", "P3.2.6": "Net resistance and circuit calculations", "P3.2.7": "Sensing circuits", "P3.2.8": "Electrical power"}, "P3.3 Magnets and magnetic fields": {"P3.3.1": "Magnets and magnetic fields", "P3.3.2": "Currents and fields", "P3.3.3": "Currents and forces", "P3.3.4": "Motors"}}'>
                  P3 E&M
             </div>
 
-            <!-- Removed Planet 4 -->
+            <!-- Hidden Planet 4 -->
+            <div class="orbit orbit4"></div>
+            <div class="planet planet4" id="planet4">
+                 HI MOM ❤️
+            </div>
 
         </div>
          <div class="planet-info" id="planet-info">
@@ -1775,7 +1944,7 @@
 
      <div id="floating-formulae-container"></div>
 
-    <!-- Subtopic Content Box HTML (Add this before closing </body>) -->
+    <!-- Subtopic Content Box HTML -->
     <div id="subtopic-content-overlay" class="subtopic-overlay"></div>
     <div id="subtopic-content-box" class="subtopic-box">
         <button id="close-subtopic-box" class="close-subtopic-btn" aria-label="Close Content Box">×</button>
@@ -1785,6 +1954,24 @@
              <p id="subtopic-box-summary"></p> <!-- Placeholder for summary -->
         </div>
     </div>
+
+    <!-- Cat Modal HTML -->
+    <div id="cat-modal-overlay"></div>
+    <div id="cat-modal">
+        <img src="3.jpg.png" alt="Cute Cats" id="cat-image"> <!-- Add your cat image path here -->
+        <p id="cat-message">LEZOGOGO MAMALIYAH HAS CUTELY COMPLETEN HER PHYSOCKSSS🐾💋😘😘😘</p>
+        <button class="close-cat-modal-btn" id="close-cat-modal-btn">Close <span style="font-size: 0.8em;">(MOWOWMWOMWOMWOMW)</span></button>
+    </div>
+
+    <!-- Love Particle Container -->
+    <div id="love-particles-container"></div>
+
+    <!-- Kiss Sound -->
+    <audio id="kissSound" preload="auto">
+        <source src="physics.mp3" type="audio/mpeg"> <!-- Add your sound file path -->
+        <!-- Add other formats like ogg if needed -->
+        Your browser does not support the audio element.
+    </audio>
 
     <script>
         document.addEventListener('DOMContentLoaded', () => {
@@ -2062,7 +2249,11 @@
 
 
             // --- Solar System / Progress Tracker Logic ---
-            const planets = document.querySelectorAll('.planet');
+            const planets = document.querySelectorAll('.planet'); // Selects all planets including planet4 initially
+            const planet1 = document.getElementById('planet1');
+            const planet2 = document.getElementById('planet2');
+            const planet3 = document.getElementById('planet3');
+            const planet4 = document.getElementById('planet4'); // Specific reference to planet 4
             const planetInfoBox = document.getElementById('planet-info');
             const planetInfoTitle = document.getElementById('planet-info-title');
             const planetInfoMessage = document.getElementById('planet-info-message');
@@ -2079,6 +2270,26 @@
             const subtopicBoxTitle = document.getElementById('subtopic-box-title'); // Get title element
             const subtopicBoxSummary = document.getElementById('subtopic-box-summary'); // Get summary p element
             const closeSubtopicBoxBtn = document.getElementById('close-subtopic-box');
+
+            // --- Cat Modal Elements ---
+            const catModalOverlay = document.getElementById('cat-modal-overlay');
+            const catModal = document.getElementById('cat-modal');
+            const closeCatModalBtn = document.getElementById('close-cat-modal-btn');
+            const loveParticlesContainer = document.getElementById('love-particles-container');
+            const kissSound = document.getElementById('kissSound');
+
+            // --- Function to check if all required planets are complete ---
+            function checkAllPlanetsComplete() {
+                const p1Complete = planet1 && planet1.classList.contains('completed');
+                const p2Complete = planet2 && planet2.classList.contains('completed');
+                const p3Complete = planet3 && planet3.classList.contains('completed');
+
+                if (p1Complete && p2Complete && p3Complete) {
+                    planet4.classList.add('visible'); // Show planet 4
+                } else {
+                    planet4.classList.remove('visible'); // Hide planet 4
+                }
+            }
 
             // --- Function to show content for a SPECIFIC subtopic ---
             function showSubtopicContent(subtopicId, subtopicText) {
@@ -2123,16 +2334,22 @@
 
 
             function loadPlanetStatus() {
-                planets.forEach(planet => {
+                // Load status for planets P1, P2, P3
+                [planet1, planet2, planet3].forEach(planet => {
+                    if (!planet) return; // Skip if planet doesn't exist
                     const topic = planet.dataset.topic;
                     if (topic && localStorage.getItem(`planet_${topic}_completed`) === 'true') {
                         planet.classList.add('completed');
                     }
                 });
+                // Check if all are complete to show planet 4
+                checkAllPlanetsComplete();
             }
 
             if (planets.length > 0 && planetInfoBox && closeInfoBtn && markCompleteBtn && planetOverlay) {
-                planets.forEach(planet => {
+                // Add click listeners ONLY to planets P1, P2, P3 for the info box
+                [planet1, planet2, planet3].forEach(planet => {
+                     if (!planet) return; // Skip if planet doesn't exist
                     planet.addEventListener('click', () => {
                         currentPlanet = planet;
                         const topic = planet.dataset.topic;
@@ -2261,14 +2478,75 @@
                                  markCompleteBtn.textContent = "Mark as Complete ✨";
                                  markCompleteBtn.style.opacity = 1;
                             }
+                            // Check if revealing/hiding planet 4 is needed
+                            checkAllPlanetsComplete();
                         }
                     }
                 });
 
-
-                loadPlanetStatus();
+                loadPlanetStatus(); // Initial check on load
             }
 
+            // --- Planet 4 Click Listener ---
+            if (planet4 && catModalOverlay && catModal && closeCatModalBtn && loveParticlesContainer && kissSound) {
+                planet4.addEventListener('click', () => {
+                     showCatModal();
+                });
+
+                closeCatModalBtn.addEventListener('click', hideCatModal);
+                catModalOverlay.addEventListener('click', hideCatModal);
+
+            } else {
+                 console.error("One or more elements for Planet 4 / Cat Modal interaction are missing.");
+            }
+
+            // --- Love Particle Functions ---
+            function createLoveParticles(count = 30) {
+                 if (!loveParticlesContainer) return;
+                 loveParticlesContainer.innerHTML = ''; // Clear previous particles
+                 const loveEmojis = ['❤️', '💖', '💕', '😘', '😍', '🥰'];
+                 const loveColors = ['var(--love-color-1)', 'var(--love-color-2)', 'var(--love-color-3)', 'var(--love-color-4)', '#ffffff']; // Add white
+
+                 for (let i = 0; i < count; i++) {
+                     const particle = document.createElement('span');
+                     particle.classList.add('love-particle');
+                     particle.textContent = loveEmojis[Math.floor(Math.random() * loveEmojis.length)];
+                     particle.style.left = `${Math.random() * 100}%`;
+                     particle.style.fontSize = `${Math.random() * 1.5 + 1}rem`; // Random size
+                     particle.style.color = loveColors[Math.floor(Math.random() * loveColors.length)];
+                     particle.style.animationDelay = `${Math.random() * 0.5}s`; // Stagger start times
+
+                     // Remove particle after animation ends
+                     particle.addEventListener('animationend', () => {
+                         particle.remove();
+                     });
+
+                     loveParticlesContainer.appendChild(particle);
+                 }
+            }
+
+            // --- Cat Modal Functions ---
+            function showCatModal() {
+                 if (!catModalOverlay || !catModal) return;
+                 catModalOverlay.classList.add('visible');
+                 catModal.classList.add('visible');
+                 createLoveParticles(); // Create particle burst
+                 try {
+                     kissSound.currentTime = 0; // Rewind if playing
+                     kissSound.play();
+                 } catch (e) {
+                     console.warn("Could not play kiss sound:", e);
+                 }
+                 body.style.overflow = 'hidden'; // Prevent scroll
+            }
+
+            function hideCatModal() {
+                 if (!catModalOverlay || !catModal) return;
+                 catModalOverlay.classList.remove('visible');
+                 catModal.classList.remove('visible');
+                 // Particles remove themselves after animation, no need to clear explicitly unless desired immediately
+                 body.style.overflow = ''; // Restore scroll
+            }
 
 
             // --- Floating Formulae ---
@@ -2374,13 +2652,19 @@
             const revealObserver = new IntersectionObserver((entries, observer) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {
-                        entry.target.classList.add('visible');
+                         // For planets, only add 'visible' if it's not planet 4
+                         // Planet 4 visibility is handled by checkAllPlanetsComplete()
+                        if (entry.target.id !== 'planet4') {
+                             entry.target.classList.add('visible');
+                        }
                         // Optional: Stop observing after reveal to save resources
                         // observer.unobserve(entry.target);
                     }
                     // Optional: If you want elements to fade out when scrolling back up
                     // else {
-                    //     entry.target.classList.remove('visible');
+                    //     if (entry.target.id !== 'planet4') { // Don't hide planet 4 on scroll out
+                    //          entry.target.classList.remove('visible');
+                    //     }
                     // }
                 });
             }, {
@@ -2389,7 +2673,10 @@
             });
 
             revealElements.forEach(el => {
-                 revealObserver.observe(el);
+                 // Don't observe planet4 with the general reveal observer initially
+                 if (el.id !== 'planet4') {
+                    revealObserver.observe(el);
+                 }
             });
             // --- End Reveal on Scroll Logic ---
 
